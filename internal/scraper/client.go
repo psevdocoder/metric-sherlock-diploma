@@ -37,6 +37,8 @@ func (c *MetricsClient) GetTargetMetrics(ctx context.Context, url string) (map[s
 		if err := resp.Body.Close(); err != nil {
 			logger.Error("Failed to close response body", zap.Error(err), zap.String("url", url))
 		}
+
+		c.client.CloseIdleConnections()
 	}()
 
 	if resp.StatusCode != http.StatusOK {
