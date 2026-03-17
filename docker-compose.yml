@@ -1,0 +1,12 @@
+services:
+  controller:
+    image: git.server.lan/maksim/metric-sherlock-diploma
+    container_name: controller
+  scraper:
+    image: git.server.lan/maksim/metric-sherlock-diploma
+    container_name: controller
+
+#  outbox-sidecar:
+
+#  postgres:
+
