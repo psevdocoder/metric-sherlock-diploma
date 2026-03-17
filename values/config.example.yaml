@@ -1,0 +1,24 @@
+values:
+  - name: port
+    value: int
+    usage: HTTP port to bind to
+  - name: env
+    value: string
+    usage: Application environment (dev, prod)
+
+secrets:
+  - name: db_password
+    value: string
+    usage: Database password
+
+realtime_config:
+  - name: feature_enabled
+    value: bool
+    usage: Whether feature X is enabled
+  - name: threshold
+    value: float64
+    usage: Threshold for triggering alert
+  - name: timeout
+    value: duration
+    usage: Request timeout duration
+
