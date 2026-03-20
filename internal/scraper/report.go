@@ -23,46 +23,129 @@ type Details struct {
 	Cardinality       []CardinalityViolation      `json:"cardinality,omitempty"`
 	HistogramBuckets  []HistogramBucketsViolation `json:"histogram_buckets,omitempty"`
 
-	Max MaxStats `json:"max"`
+	Max *MaxStats `json:"max,omitempty"`
+
+	ResponseWeight int64 `json:"response_weight,omitempty"`
+}
+
+func (d *Details) ensureMax() {
+	if d.Max == nil {
+		d.Max = &MaxStats{}
+	}
 }
 
 func (d *Details) addMetricNameViolation(v MetricNameViolation) {
-	d.MetricNameTooLong = append(d.MetricNameTooLong, v)
+	for i := range d.MetricNameTooLong {
+		if d.MetricNameTooLong[i].MetricName == v.MetricName {
+			if v.Length > d.MetricNameTooLong[i].Length {
+				d.MetricNameTooLong[i] = v
+			}
+			d.updateMaxMetricName(v)
+			return
+		}
+	}
 
+	d.MetricNameTooLong = append(d.MetricNameTooLong, v)
+	d.updateMaxMetricName(v)
+}
+
+func (d *Details) updateMaxMetricName(v MetricNameViolation) {
+	d.ensureMax()
 	if d.Max.MetricNameTooLong == nil || v.Length > d.Max.MetricNameTooLong.Length {
-		d.Max.MetricNameTooLong = &v
+		d.Max.MetricNameTooLong = new(v)
 	}
 }
 
 func (d *Details) addLabelNameViolation(v LabelNameViolation) {
-	d.LabelNameTooLong = append(d.LabelNameTooLong, v)
+	for i := range d.LabelNameTooLong {
+		if d.LabelNameTooLong[i].MetricName == v.MetricName &&
+			d.LabelNameTooLong[i].LabelName == v.LabelName {
 
+			if v.Length > d.LabelNameTooLong[i].Length {
+				d.LabelNameTooLong[i] = v
+			}
+			d.updateMaxLabelName(v)
+			return
+		}
+	}
+
+	d.LabelNameTooLong = append(d.LabelNameTooLong, v)
+	d.updateMaxLabelName(v)
+}
+
+func (d *Details) updateMaxLabelName(v LabelNameViolation) {
+	d.ensureMax()
 	if d.Max.LabelNameTooLong == nil || v.Length > d.Max.LabelNameTooLong.Length {
-		d.Max.LabelNameTooLong = &v
+		d.Max.LabelNameTooLong = new(v)
 	}
 }
 
 func (d *Details) addLabelValueViolation(v LabelValueViolation) {
-	d.LabelValueTooLong = append(d.LabelValueTooLong, v)
+	for i := range d.LabelValueTooLong {
+		if d.LabelValueTooLong[i].MetricName == v.MetricName &&
+			d.LabelValueTooLong[i].LabelName == v.LabelName &&
+			d.LabelValueTooLong[i].Value == v.Value {
 
+			if v.Length > d.LabelValueTooLong[i].Length {
+				d.LabelValueTooLong[i] = v
+			}
+			d.updateMaxLabelValue(v)
+			return
+		}
+	}
+
+	d.LabelValueTooLong = append(d.LabelValueTooLong, v)
+	d.updateMaxLabelValue(v)
+}
+
+func (d *Details) updateMaxLabelValue(v LabelValueViolation) {
+	d.ensureMax()
 	if d.Max.LabelValueTooLong == nil || v.Length > d.Max.LabelValueTooLong.Length {
-		d.Max.LabelValueTooLong = &v
+		d.Max.LabelValueTooLong = new(v)
 	}
 }
 
 func (d *Details) addCardinalityViolation(v CardinalityViolation) {
-	d.Cardinality = append(d.Cardinality, v)
+	for i := range d.Cardinality {
+		if d.Cardinality[i].MetricName == v.MetricName {
+			if v.Value > d.Cardinality[i].Value {
+				d.Cardinality[i] = v
+			}
+			d.updateMaxCardinality(v)
+			return
+		}
+	}
 
+	d.Cardinality = append(d.Cardinality, v)
+	d.updateMaxCardinality(v)
+}
+
+func (d *Details) updateMaxCardinality(v CardinalityViolation) {
+	d.ensureMax()
 	if d.Max.Cardinality == nil || v.Value > d.Max.Cardinality.Value {
-		d.Max.Cardinality = &v
+		d.Max.Cardinality = new(v)
 	}
 }
 
 func (d *Details) addHistogramBucketsViolation(v HistogramBucketsViolation) {
-	d.HistogramBuckets = append(d.HistogramBuckets, v)
+	for i := range d.HistogramBuckets {
+		if d.HistogramBuckets[i].MetricName == v.MetricName {
+			if v.Buckets > d.HistogramBuckets[i].Buckets {
+				d.HistogramBuckets[i] = v
+			}
+			d.updateMaxHistogram(v)
+			return
+		}
+	}
 
+	d.HistogramBuckets = append(d.HistogramBuckets, v)
+	d.updateMaxHistogram(v)
+}
+
+func (d *Details) updateMaxHistogram(v HistogramBucketsViolation) {
+	d.ensureMax()
 	if d.Max.HistogramBuckets == nil || v.Buckets > d.Max.HistogramBuckets.Buckets {
-		d.Max.HistogramBuckets = &v
+		d.Max.HistogramBuckets = new(v)
 	}
 }
 

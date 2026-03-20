@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strings"
 	"syscall"
@@ -94,7 +95,15 @@ func main() {
 		return cronManager.Stop(ctx)
 	})
 
-	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient())
+	limitsConfigRaw, _ := config.GetValue(config.LimitsConfig)
+	limitsConfigStr, _ := limitsConfigRaw.String()
+
+	var limitsConfig scraper.LimitsConfig
+	if err := json.Unmarshal([]byte(limitsConfigStr), &limitsConfig); err != nil {
+		logger.Fatal("Failed to parse limits config", zap.Error(err))
+	}
+
+	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig)
 	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
 	// инициируем консьюмера с флагом isLeader = true чтобы он не начал сразу брать задачи в обработку,
 	// если под действительно будет лидером

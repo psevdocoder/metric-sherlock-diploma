@@ -10,7 +10,13 @@ import (
 )
 
 const saveReportsSQL = `
-INSERT INTO reports (target_group, env, cluster, team_name, details, created_at) VALUES ($1,$2,$3,$4,$5,$6)
+INSERT INTO reports (target_group, env, cluster, team_name, details, created_at)
+VALUES ($1,$2,$3,$4,$5,$6)
+ON CONFLICT (target_group, env, cluster)
+DO UPDATE SET
+team_name = EXCLUDED.team_name,
+details   = EXCLUDED.details,
+created_at = EXCLUDED.created_at
 `
 
 func (s *Storage) SaveReports(ctx context.Context, reports []*scraper.Report) error {

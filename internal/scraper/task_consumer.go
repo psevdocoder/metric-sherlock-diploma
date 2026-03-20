@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	waitNewTasksInterval = 10 * time.Second
+	waitNewTasksInterval = 5 * time.Second
 	batchFlushInterval   = 5 * time.Second
 	batchSize            = 1000
 
@@ -179,13 +179,17 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 				continue
 			}
 
-			logger.Debug("Task consumer new iteration")
-
 			tasks, err := c.taskStorage.GetScrapeTasks(ctx, tasksPerRequest)
 			if err != nil {
 				logger.Error("Failed to get scrape tasks", zap.Error(err))
 				continue
 			}
+
+			if len(tasks) < 1 {
+				continue
+			}
+
+			logger.Debug("Task consumer new iteration")
 
 			for _, task := range tasks {
 				c.workerPool.Submit(task)

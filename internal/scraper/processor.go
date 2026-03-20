@@ -12,11 +12,13 @@ import (
 
 type Processor struct {
 	client *MetricsClient
+	limits LimitsConfig
 }
 
-func NewProcessor(client *MetricsClient) *Processor {
+func NewProcessor(client *MetricsClient, limitsConfig LimitsConfig) *Processor {
 	return &Processor{
 		client: client,
+		limits: limitsConfig,
 	}
 }
 
@@ -37,16 +39,20 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 	totalProcessed := 0
 
 	for _, address := range task.Addresses {
-		metrics, err := p.client.GetTargetMetrics(ctx, address)
+		metrics, bytesWeight, err := p.client.GetTargetMetrics(ctx, address)
 		if err != nil {
 			logger.Error("Failed to get target metrics", zap.Error(err))
 			continue
 		}
 
 		for _, metric := range metrics {
-			handleMetricFamily(statistic, metric)
+			p.handleMetricFamily(statistic, metric)
 		}
 		totalProcessed++
+
+		if p.limits.MaxBytesWeight < bytesWeight && statistic.Details.ResponseWeight < bytesWeight {
+			statistic.Details.ResponseWeight = bytesWeight
+		}
 	}
 
 	if totalProcessed == 0 {
@@ -56,15 +62,7 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 	return statistic, nil
 }
 
-const (
-	maxMetricNameLen    = 100
-	maxLabelNameLen     = 100
-	maxLabelValueLen    = 200
-	maxLabelCardinality = 20
-	maxHistogramBuckets = 50
-)
-
-func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
+func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 	if mf == nil {
 		return
 	}
@@ -73,7 +71,7 @@ func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 	metricName := mf.GetName()
 
 	// --- длина имени метрики
-	if l := len(metricName); l > maxMetricNameLen {
+	if l := len(metricName); l > p.limits.MaxMetricNameLen {
 		d.addMetricNameViolation(MetricNameViolation{
 			MetricName: metricName,
 			Length:     l,
@@ -81,20 +79,20 @@ func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 	}
 
 	// --- кардинальность
-	if cardinality := len(mf.Metric); cardinality > maxLabelCardinality {
+	if cardinality := len(mf.Metric); cardinality > p.limits.MaxMetricCardinality {
 		d.addCardinalityViolation(CardinalityViolation{
 			MetricName: metricName,
 			Value:      cardinality,
 		})
 	}
 
-	// --- обход метрик
+	// обход метрик
 	for _, m := range mf.Metric {
 		if m == nil {
 			continue
 		}
 
-		// --- лейблы
+		// лейблы
 		for _, label := range m.Label {
 			if label == nil {
 				continue
@@ -103,7 +101,7 @@ func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 			labelName := label.GetName()
 			labelValue := label.GetValue()
 
-			if l := len(labelName); l > maxLabelNameLen {
+			if l := len(labelName); l > p.limits.MaxLabelNameLen {
 				d.addLabelNameViolation(LabelNameViolation{
 					MetricName: metricName,
 					LabelName:  labelName,
@@ -111,7 +109,7 @@ func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 				})
 			}
 
-			if l := len(labelValue); l > maxLabelValueLen {
+			if l := len(labelValue); l > p.limits.MaxLabelValueLen {
 				d.addLabelValueViolation(LabelValueViolation{
 					MetricName: metricName,
 					LabelName:  labelName,
@@ -121,9 +119,9 @@ func handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 			}
 		}
 
-		// --- гистограмма
+		// гистограмма
 		if h := m.GetHistogram(); h != nil {
-			if buckets := len(h.Bucket); buckets > maxHistogramBuckets {
+			if buckets := len(h.Bucket); buckets > p.limits.MaxHistogramBuckets {
 				d.addHistogramBucketsViolation(HistogramBucketsViolation{
 					MetricName: metricName,
 					Buckets:    buckets,
