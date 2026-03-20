@@ -25,6 +25,7 @@ type Labels struct {
 	Env         string `yaml:"env"`
 	TargetGroup string `yaml:"target_group"`
 	Cluster     string `yaml:"cluster"`
+	TeamName    string `yaml:"team_name"`
 }
 
 func LoadSDConfig(filename string) (*SDConfig, error) {

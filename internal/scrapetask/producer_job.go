@@ -46,7 +46,7 @@ func (j *Job) Work(ctx context.Context) error {
 			addresses := make([]string, 0, len(staticConfig.Targets))
 
 			for _, address := range staticConfig.Targets {
-				addresses = append(addresses, fmt.Sprintf("%s%s", address, scrapeConfig.MetricsPath))
+				addresses = append(addresses, fmt.Sprintf("http://%s%s", address, scrapeConfig.MetricsPath))
 			}
 
 			scrapeTasks = append(scrapeTasks, ScrapeTask{
@@ -57,6 +57,7 @@ func (j *Job) Work(ctx context.Context) error {
 				TargetGroup: staticConfig.Labels.TargetGroup,
 				Env:         staticConfig.Labels.Env,
 				Cluster:     staticConfig.Labels.Cluster,
+				TeamName:    staticConfig.Labels.TeamName,
 			})
 		}
 	}

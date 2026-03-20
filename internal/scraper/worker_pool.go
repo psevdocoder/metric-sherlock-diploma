@@ -5,11 +5,12 @@ import (
 	"sync"
 
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
+	"git.server.lan/pkg/zaplogger/logger"
 )
 
 type workerResult struct {
 	taskID int64
-	stat   *Statistic
+	stat   *Report
 	err    error
 }
 
@@ -85,10 +86,8 @@ func (p *WorkerPool) Results() <-chan *workerResult {
 
 func (p *WorkerPool) Stop() {
 	p.cancel()
-
 	close(p.jobs)
-
 	p.wg.Wait()
-
 	close(p.results)
+	logger.Debug("Worker pool stopped")
 }

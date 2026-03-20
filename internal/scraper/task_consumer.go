@@ -29,7 +29,7 @@ type taskStorage interface {
 }
 
 type statisticStorage interface {
-	SaveStatistics(ctx context.Context, stats []*Statistic) error
+	SaveReports(ctx context.Context, stats []*Report) error
 }
 
 type TaskConsumer struct {
@@ -69,7 +69,7 @@ func (c *TaskConsumer) IsLeader() bool {
 
 func (c *TaskConsumer) Run(ctx context.Context) {
 
-	statBatch := make([]*Statistic, 0, batchSize)
+	statBatch := make([]*Report, 0, batchSize)
 	statusBatch := make([]*TaskStatusUpdate, 0, batchSize)
 
 	flushTicker := time.NewTicker(batchFlushInterval)
@@ -79,9 +79,8 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 	defer taskTicker.Stop()
 
 	defer func() {
-
 		if len(statBatch) > 0 {
-			if err := c.statisticStorage.SaveStatistics(ctx, statBatch); err != nil {
+			if err := c.statisticStorage.SaveReports(ctx, statBatch); err != nil {
 				logger.Error("Failed to flush statistics on shutdown", zap.Error(err))
 			}
 		}
@@ -95,7 +94,6 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 	}()
 
 	for {
-
 		select {
 
 		case <-ctx.Done():
@@ -109,14 +107,12 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 			return
 
 		case res, ok := <-c.workerPool.Results():
-
 			if !ok {
 				logger.Info("Worker pool results channel closed")
 				return
 			}
 
 			if res.err != nil {
-
 				statusBatch = append(statusBatch, &TaskStatusUpdate{
 					ID:     res.taskID,
 					Status: scrapetask.TaskStatusError,
@@ -141,7 +137,7 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 
 			if len(statBatch) >= batchSize {
 
-				if err := c.statisticStorage.SaveStatistics(ctx, statBatch); err != nil {
+				if err := c.statisticStorage.SaveReports(ctx, statBatch); err != nil {
 					logger.Error("Failed to save statistics batch", zap.Error(err))
 				} else {
 					statBatch = statBatch[:0]
@@ -161,7 +157,7 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 
 			if len(statBatch) > 0 {
 
-				if err := c.statisticStorage.SaveStatistics(ctx, statBatch); err != nil {
+				if err := c.statisticStorage.SaveReports(ctx, statBatch); err != nil {
 					logger.Error("Failed to flush statistics", zap.Error(err))
 				} else {
 					statBatch = statBatch[:0]
@@ -182,6 +178,8 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 			if c.isLeader.Load() {
 				continue
 			}
+
+			logger.Debug("Task consumer new iteration")
 
 			tasks, err := c.taskStorage.GetScrapeTasks(ctx, tasksPerRequest)
 			if err != nil {

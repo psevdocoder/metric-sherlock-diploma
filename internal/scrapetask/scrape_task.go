@@ -17,8 +17,8 @@ type ScrapeTask struct {
 	CreatedAt   time.Time
 	Job         string
 	Addresses   []string
-	TargetID    int
 	TargetGroup string
 	Env         string
 	Cluster     string
+	TeamName    string
 }

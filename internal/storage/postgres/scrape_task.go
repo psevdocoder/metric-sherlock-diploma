@@ -9,7 +9,7 @@ import (
 )
 
 const saveScrapeTasksSQL = `
-INSERT INTO scrape_tasks (status, created_at, job, address, target_id, cluster, env, target_group)
+INSERT INTO scrape_tasks (status, created_at, job, addresses, cluster, env, target_group, team_name)
 VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`
 
 // SaveScrapeTasks сохраняет задачи на сбор метрик
@@ -29,11 +29,11 @@ func (s *Storage) SaveScrapeTasks(ctx context.Context, tasks []scrapetask.Scrape
 			task.Status,
 			task.CreatedAt,
 			task.Job,
-			task.Address,
-			task.TargetID,
+			task.Addresses,
 			task.Cluster,
 			task.Env,
 			task.TargetGroup,
+			task.TeamName,
 		)
 
 		total++
@@ -68,11 +68,11 @@ RETURNING
     st.status,
     st.created_at,
     st.job,
-    st.address,
-    st.target_id,
+    st.addresses,
     st.cluster,
     st.env,
-    st.target_group;
+    st.target_group,
+    st.team_name;
 `
 
 func (s *Storage) GetScrapeTasks(ctx context.Context, limit int) ([]*scrapetask.ScrapeTask, error) {
@@ -91,23 +91,24 @@ func (s *Storage) GetScrapeTasks(ctx context.Context, limit int) ([]*scrapetask.
 	tasks := make([]*scrapetask.ScrapeTask, 0)
 
 	for rows.Next() {
-		t := &scrapetask.ScrapeTask{}
+		task := &scrapetask.ScrapeTask{}
 
 		err = rows.Scan(
-			&t.Status,
-			&t.CreatedAt,
-			&t.Job,
-			&t.Address,
-			&t.TargetID,
-			&t.Cluster,
-			&t.Env,
-			&t.TargetGroup,
+			&task.ID,
+			&task.Status,
+			&task.CreatedAt,
+			&task.Job,
+			&task.Addresses,
+			&task.Cluster,
+			&task.Env,
+			&task.TargetGroup,
+			&task.TeamName,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		tasks = append(tasks, t)
+		tasks = append(tasks, task)
 	}
 
 	return tasks, rows.Err()
