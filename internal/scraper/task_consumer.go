@@ -32,26 +32,32 @@ type statisticStorage interface {
 	SaveReports(ctx context.Context, stats []*Report) error
 }
 
+type targetGroupStorage interface {
+	SaveOrUpdateTargetGroups(ctx context.Context, groups []*TargetGroup) error
+}
+
 type TaskConsumer struct {
-	taskStorage      taskStorage
-	statisticStorage statisticStorage
-	workerPool       *WorkerPool
-	stopCh           chan struct{}
-	isLeader         atomic.Bool
+	taskStorage        taskStorage
+	statisticStorage   statisticStorage
+	targetGroupStorage targetGroupStorage
+	workerPool         *WorkerPool
+	stopCh             chan struct{}
+	isLeader           atomic.Bool
 }
 
 func NewTaskConsumer(
 	taskStorage taskStorage,
 	statisticStorage statisticStorage,
+	targetGroupStorage targetGroupStorage,
 	workerPool *WorkerPool,
 	isLeader bool,
 ) *TaskConsumer {
-
 	c := &TaskConsumer{
-		taskStorage:      taskStorage,
-		statisticStorage: statisticStorage,
-		workerPool:       workerPool,
-		stopCh:           make(chan struct{}),
+		taskStorage:        taskStorage,
+		statisticStorage:   statisticStorage,
+		targetGroupStorage: targetGroupStorage,
+		workerPool:         workerPool,
+		stopCh:             make(chan struct{}),
 	}
 
 	c.isLeader.Store(isLeader)
@@ -68,9 +74,9 @@ func (c *TaskConsumer) IsLeader() bool {
 }
 
 func (c *TaskConsumer) Run(ctx context.Context) {
-
 	statBatch := make([]*Report, 0, batchSize)
 	statusBatch := make([]*TaskStatusUpdate, 0, batchSize)
+	targetGroupBatch := make([]*TargetGroup, 0, batchSize)
 
 	flushTicker := time.NewTicker(batchFlushInterval)
 	taskTicker := time.NewTicker(waitNewTasksInterval)
@@ -91,11 +97,15 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 			}
 		}
 
+		if len(targetGroupBatch) > 0 {
+			if err := c.targetGroupStorage.SaveOrUpdateTargetGroups(ctx, targetGroupBatch); err != nil {
+				logger.Error("Failed to flush target groups on shutdown", zap.Error(err))
+			}
+		}
 	}()
 
 	for {
 		select {
-
 		case <-ctx.Done():
 			logger.Info("Task consumer stopping: context cancelled")
 			c.workerPool.Stop()
@@ -118,13 +128,12 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 					Status: scrapetask.TaskStatusError,
 				})
 
-				logger.Error("Worker returned error",
+				logger.Error(
+					"Worker returned error",
 					zap.Int64("task_id", res.taskID),
 					zap.Error(res.err),
 				)
-
 			} else {
-
 				statusBatch = append(statusBatch, &TaskStatusUpdate{
 					ID:     res.taskID,
 					Status: scrapetask.TaskStatusComplete,
@@ -133,10 +142,13 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 				if res.stat != nil {
 					statBatch = append(statBatch, res.stat)
 				}
+
+				if len(res.targetGroups) > 0 {
+					targetGroupBatch = append(targetGroupBatch, res.targetGroups...)
+				}
 			}
 
 			if len(statBatch) >= batchSize {
-
 				if err := c.statisticStorage.SaveReports(ctx, statBatch); err != nil {
 					logger.Error("Failed to save statistics batch", zap.Error(err))
 				} else {
@@ -145,7 +157,6 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 			}
 
 			if len(statusBatch) >= batchSize {
-
 				if err := c.taskStorage.UpdateTaskStatuses(ctx, statusBatch); err != nil {
 					logger.Error("Failed to update task statuses", zap.Error(err))
 				} else {
@@ -153,10 +164,16 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 				}
 			}
 
+			if len(targetGroupBatch) >= batchSize {
+				if err := c.targetGroupStorage.SaveOrUpdateTargetGroups(ctx, targetGroupBatch); err != nil {
+					logger.Error("Failed to save target groups batch", zap.Error(err))
+				} else {
+					targetGroupBatch = targetGroupBatch[:0]
+				}
+			}
+
 		case <-flushTicker.C:
-
 			if len(statBatch) > 0 {
-
 				if err := c.statisticStorage.SaveReports(ctx, statBatch); err != nil {
 					logger.Error("Failed to flush statistics", zap.Error(err))
 				} else {
@@ -165,7 +182,6 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 			}
 
 			if len(statusBatch) > 0 {
-
 				if err := c.taskStorage.UpdateTaskStatuses(ctx, statusBatch); err != nil {
 					logger.Error("Failed to flush task statuses", zap.Error(err))
 				} else {
@@ -173,8 +189,15 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 				}
 			}
 
-		case <-taskTicker.C:
+			if len(targetGroupBatch) > 0 {
+				if err := c.targetGroupStorage.SaveOrUpdateTargetGroups(ctx, targetGroupBatch); err != nil {
+					logger.Error("Failed to flush target groups", zap.Error(err))
+				} else {
+					targetGroupBatch = targetGroupBatch[:0]
+				}
+			}
 
+		case <-taskTicker.C:
 			if c.isLeader.Load() {
 				continue
 			}
@@ -185,7 +208,7 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 				continue
 			}
 
-			if len(tasks) < 1 {
+			if len(tasks) == 0 {
 				continue
 			}
 
@@ -199,12 +222,10 @@ func (c *TaskConsumer) Run(ctx context.Context) {
 }
 
 func (c *TaskConsumer) Stop() {
-
 	select {
 	case <-c.stopCh:
 		return
 	default:
 		close(c.stopCh)
 	}
-
 }

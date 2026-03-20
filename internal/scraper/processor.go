@@ -22,7 +22,7 @@ func NewProcessor(client *MetricsClient, limitsConfig LimitsConfig) *Processor {
 	}
 }
 
-func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*Report, error) {
+func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*Report, []*TargetGroup, error) {
 	logger.Debug(
 		"Processing target group",
 		zap.String("target_group", task.TargetGroup),
@@ -56,10 +56,18 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 	}
 
 	if totalProcessed == 0 {
-		return nil, errors.New("failed to get target metrics")
+		return nil, nil, errors.New("failed to get target metrics")
 	}
 
-	return statistic, nil
+	tg := &TargetGroup{
+		Name:     task.TargetGroup,
+		Env:      task.Env,
+		Cluster:  task.Cluster,
+		Job:      task.Job,
+		TeamName: task.TeamName,
+	}
+
+	return statistic, []*TargetGroup{tg}, nil
 }
 
 func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
@@ -70,7 +78,6 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 	d := &stats.Details
 	metricName := mf.GetName()
 
-	// --- длина имени метрики
 	if l := len(metricName); l > p.limits.MaxMetricNameLen {
 		d.addMetricNameViolation(MetricNameViolation{
 			MetricName: metricName,
@@ -78,7 +85,6 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 		})
 	}
 
-	// --- кардинальность
 	if cardinality := len(mf.Metric); cardinality > p.limits.MaxMetricCardinality {
 		d.addCardinalityViolation(CardinalityViolation{
 			MetricName: metricName,
@@ -86,13 +92,11 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 		})
 	}
 
-	// обход метрик
 	for _, m := range mf.Metric {
 		if m == nil {
 			continue
 		}
 
-		// лейблы
 		for _, label := range m.Label {
 			if label == nil {
 				continue
@@ -119,7 +123,6 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 			}
 		}
 
-		// гистограмма
 		if h := m.GetHistogram(); h != nil {
 			if buckets := len(h.Bucket); buckets > p.limits.MaxHistogramBuckets {
 				d.addHistogramBucketsViolation(HistogramBucketsViolation{

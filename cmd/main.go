@@ -107,7 +107,7 @@ func main() {
 	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
 	// инициируем консьюмера с флагом isLeader = true чтобы он не начал сразу брать задачи в обработку,
 	// если под действительно будет лидером
-	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, taskConsumerPool, false)
+	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
 	go taskConsumer.Run(ctx)
 
 	closer.Add(func() error {

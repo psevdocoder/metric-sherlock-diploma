@@ -9,9 +9,10 @@ import (
 )
 
 type workerResult struct {
-	taskID int64
-	stat   *Report
-	err    error
+	taskID       int64
+	stat         *Report
+	targetGroups []*TargetGroup
+	err          error
 }
 
 type WorkerPool struct {
@@ -56,12 +57,13 @@ func (p *WorkerPool) worker() {
 				return
 			}
 
-			stat, err := p.processor.Process(p.ctx, task)
+			stat, targetGroups, err := p.processor.Process(p.ctx, task)
 
 			res := &workerResult{
-				taskID: task.ID,
-				stat:   stat,
-				err:    err,
+				taskID:       task.ID,
+				stat:         stat,
+				targetGroups: targetGroups,
+				err:          err,
 			}
 
 			select {
