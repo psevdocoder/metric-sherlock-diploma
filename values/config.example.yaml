@@ -5,6 +5,27 @@ values:
   - name: env
     value: string
     usage: Application environment (dev, prod)
+  - name: produce_tasks_cron_expr
+    value: string
+    usage: Cron expression for scrape task producer
+  - name: limits_config
+    value: string
+    usage: JSON encoded limits config for metrics checks
+  - name: kafka_brokers
+    value: string
+    usage: Comma separated kafka brokers
+  - name: kafka_violations_topic
+    value: string
+    usage: Kafka topic for service violation facts
+  - name: outbox_poll_interval
+    value: duration
+    usage: Interval for polling outbox rows
+  - name: outbox_batch_size
+    value: int
+    usage: Max outbox messages per poll
+  - name: outbox_max_retries
+    value: int
+    usage: Max retries before marking outbox row as failed
 
 secrets:
   - name: db_password
@@ -21,4 +42,3 @@ realtime_config:
   - name: timeout
     value: duration
     usage: Request timeout duration
-

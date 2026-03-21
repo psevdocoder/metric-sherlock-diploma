@@ -25,7 +25,8 @@ run:
 	go run ./cmd
 
 
-PROTO_FILE=proto/metricsherlock/targetgroups/v1/target_groups.proto
+PROTO_API_FILE=proto/metricsherlock/targetgroups/v1/target_groups.proto
+PROTO_EVENT_FILE=proto/metricsherlock/metricviolations/v1/metric_violation_fact.proto
 GOOGLEAPIS_DIR=$(shell go env GOPATH)/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis
 
 .PHONY: proto
@@ -37,4 +38,7 @@ proto:
 		--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
 		--openapiv2_out=internal/httpapi/static \
 		--openapiv2_opt=allow_merge=true,merge_file_name=target_groups \
-		$(PROTO_FILE)
+		$(PROTO_API_FILE)
+	protoc -I . \
+		--go_out=. --go_opt=paths=source_relative \
+		$(PROTO_EVENT_FILE)

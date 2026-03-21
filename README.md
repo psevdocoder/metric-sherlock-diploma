@@ -3,6 +3,8 @@
 ## HTTP API
 
 API описан в protobuf-контракте: `proto/metricsherlock/targetgroups/v1/target_groups.proto`.
+Kafka событие факта проверки нарушений описано в protobuf-контракте:
+`proto/metricsherlock/metricviolations/v1/metric_violation_fact.proto`.
 
 ### Endpoints
 

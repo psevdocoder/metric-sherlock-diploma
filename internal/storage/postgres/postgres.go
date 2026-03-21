@@ -18,16 +18,18 @@ const (
 	errCodeDeadlock = "40P01"
 	backoffInterval = 1 * time.Second
 
-	rowsPerBatch = 1000
+	rowsPerBatch       = 1000
+	defaultOutboxTopic = "metric-sherlock"
 )
 
 // Storage представляет собой хранилище Postgres
 type Storage struct {
-	pool *pgxpool.Pool
+	pool        *pgxpool.Pool
+	outboxTopic string
 }
 
 // New конструктор для Storage, принимает контекст и адрес подключения для соединения с Postgres
-func New(ctx context.Context, dsn string) (*Storage, error) {
+func New(ctx context.Context, dsn string, outboxTopic string) (*Storage, error) {
 	conn, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		return nil, err
@@ -38,11 +40,22 @@ func New(ctx context.Context, dsn string) (*Storage, error) {
 		return nil
 	})
 
-	return &Storage{pool: conn}, nil
+	if outboxTopic == "" {
+		outboxTopic = defaultOutboxTopic
+	}
+
+	return &Storage{
+		pool:        conn,
+		outboxTopic: outboxTopic,
+	}, nil
 }
 
 type batchSender interface {
 	SendBatch(ctx context.Context, batch *pgx.Batch) pgx.BatchResults
+}
+
+type dbtx interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
 }
 
 func (s *Storage) sendBatch(ctx context.Context, batch *pgx.Batch, sender batchSender) error {

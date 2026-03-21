@@ -1,161 +1,86 @@
-x-etcd-common: &etcd-common
-  image: quay.io/coreos/etcd:v3.5.13
-  command:
-    - etcd
-    - --data-dir=/etcd-data
-    - --log-level=warn
-    - --listen-peer-urls=http://0.0.0.0:2380
-    - --listen-client-urls=http://0.0.0.0:2379
-    - --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
-    - --initial-cluster-state=new
-    - --initial-cluster-token=etcd-cluster-1
-
 x-kafka-common: &kafka-common
   image: confluentinc/cp-kafka:7.5.0
   restart: unless-stopped
   environment:
+    # --- KRaft ---
+    KAFKA_ENABLE_KRAFT: "yes"
     KAFKA_PROCESS_ROLES: broker,controller
+    KAFKA_NODE_ID: 1
+    CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+    # --- Networking ---
     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
-    KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9093,2@kafka2:9093,3@kafka3:9093
+    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,EXTERNAL://localhost:19092
 
-    KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-    KAFKA_MIN_INSYNC_REPLICAS: 2
-    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-    KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
-    KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+    # --- KRaft quorum ---
+    KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9093
 
+    # --- single node ---
+    KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+    KAFKA_MIN_INSYNC_REPLICAS: 1
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+    # --- misc ---
     KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
     KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-
     KAFKA_LOG_DIRS: /var/lib/kafka/data
     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
 services:
-  controller:
-    image: git.server.lan/maksim/metric-sherlock-diploma
-    container_name: controller
-  scraper:
-    image: git.server.lan/maksim/metric-sherlock-diploma
-    container_name: controller
-
-  etcd1:
-    <<: *etcd-common
-    container_name: etcd1
-    environment:
-      ETCD_NAME: etcd1
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:2380
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:2379
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
     ports:
-      - "23791:2379"
-    volumes:
-      - ./data/etcd1:/etcd-data
-
-  etcd2:
-    <<: *etcd-common
-    container_name: etcd2
+      - "5432:5432"
     environment:
-      ETCD_NAME: etcd2
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd2:2380
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd2:2379
-    ports:
-      - "23792:2379"
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: metric-sherlock
     volumes:
-      - ./data/etcd2:/etcd-data
+      - ./postgres:/var/lib/postgresql
 
-  etcd3:
-    <<: *etcd-common
-    container_name: etcd3
-    environment:
-      ETCD_NAME: etcd3
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd3:2380
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd3:2379
-    ports:
-      - "23793:2379"
+  kafka-permissions:
+    image: alpine:3.20
+    container_name: kafka-permissions
+    command: >
+      sh -c "mkdir -p /var/lib/kafka/data && chown -R 1000:1000 /var/lib/kafka/data"
     volumes:
-      - ./data/etcd3:/etcd-data
+      - ./data/kafka1:/var/lib/kafka/data
+    restart: "no"
 
   kafka1:
     <<: *kafka-common
     container_name: kafka1
     hostname: kafka1
+    depends_on:
+      - kafka-permissions
     ports:
       - "9092:9092"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      - "19092:19092"
     volumes:
       - ./data/kafka1:/var/lib/kafka/data
-
-  kafka2:
-    <<: *kafka-common
-    container_name: kafka2
-    hostname: kafka2
-    ports:
-      - "9094:9092"
-    environment:
-      KAFKA_NODE_ID: 2
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
-    volumes:
-      - ./data/kafka2:/var/lib/kafka/data
-
-  kafka3:
-    <<: *kafka-common
-    container_name: kafka3
-    hostname: kafka3
-    ports:
-      - "9096:9092"
-    environment:
-      KAFKA_NODE_ID: 3
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9096
-    volumes:
-      - ./data/kafka3:/var/lib/kafka/data
 
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka-init
     depends_on:
       - kafka1
-      - kafka2
-      - kafka3
-    entrypoint: [ "/bin/bash", "-c" ]
-    command: |
-      echo "Waiting for Kafka..."
-      cub kafka-ready -b kafka1:9092 1 60
-
-      TOPICS=(
-        "metric-sherlock:3"
-      )
-
-      for t in "${TOPICS[@]}"; do
-        NAME="${t%%:*}"
-        PARTS="${t##*:}"
-
-        kafka-topics \
-          --bootstrap-server kafka1:9092 \
-          --topic "$NAME" \
-          --describe > /dev/null 2>&1 || \
-        kafka-topics \
-          --bootstrap-server kafka1:9092 \
-          --create \
-          --if-not-exists \
-          --topic "$NAME" \
-          --partitions "$PARTS" \
-          --replication-factor 3 \
-          --config min.insync.replicas=2
-      done
-
-      echo "Kafka topics ready."
+    command: >
+      bash -c "
+        set -e;
+        echo 'Waiting for Kafka...';
+        until kafka-topics --bootstrap-server kafka1:9092 --list >/dev/null 2>&1; do sleep 1; done;
+        echo 'Kafka ready, waiting controller...';
+        sleep 10;
+        echo 'Creating topic...';
+        kafka-topics --bootstrap-server kafka1:9092 --create --if-not-exists --topic metric-sherlock --partitions 3 --replication-factor 1;
+        echo 'Done';
+      "
     restart: "no"
-
-
-#  outbox-sidecar:
-
-#  postgres:
-
-

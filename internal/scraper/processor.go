@@ -50,6 +50,10 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 		}
 		totalProcessed++
 
+		if bytesWeight > statistic.maxResponseWeight {
+			statistic.maxResponseWeight = bytesWeight
+		}
+
 		if p.limits.MaxBytesWeight < bytesWeight && statistic.Details.ResponseWeight < bytesWeight {
 			statistic.Details.ResponseWeight = bytesWeight
 		}
@@ -67,6 +71,8 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 		TeamName: task.TeamName,
 	}
 
+	statistic.Checks = buildCheckResults(statistic, p.limits)
+
 	return statistic, []*TargetGroup{tg}, nil
 }
 
@@ -78,11 +84,19 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 	d := &stats.Details
 	metricName := mf.GetName()
 
+	if l := len(metricName); l > stats.maxMetricNameLen {
+		stats.maxMetricNameLen = l
+	}
+
 	if l := len(metricName); l > p.limits.MaxMetricNameLen {
 		d.addMetricNameViolation(MetricNameViolation{
 			MetricName: metricName,
 			Length:     l,
 		})
+	}
+
+	if cardinality := len(mf.Metric); cardinality > stats.maxMetricCardinality {
+		stats.maxMetricCardinality = cardinality
 	}
 
 	if cardinality := len(mf.Metric); cardinality > p.limits.MaxMetricCardinality {
@@ -105,12 +119,20 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 			labelName := label.GetName()
 			labelValue := label.GetValue()
 
+			if l := len(labelName); l > stats.maxLabelNameLen {
+				stats.maxLabelNameLen = l
+			}
+
 			if l := len(labelName); l > p.limits.MaxLabelNameLen {
 				d.addLabelNameViolation(LabelNameViolation{
 					MetricName: metricName,
 					LabelName:  labelName,
 					Length:     l,
 				})
+			}
+
+			if l := len(labelValue); l > stats.maxLabelValueLen {
+				stats.maxLabelValueLen = l
 			}
 
 			if l := len(labelValue); l > p.limits.MaxLabelValueLen {
@@ -124,6 +146,10 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 		}
 
 		if h := m.GetHistogram(); h != nil {
+			if buckets := len(h.Bucket); buckets > stats.maxHistogramBuckets {
+				stats.maxHistogramBuckets = buckets
+			}
+
 			if buckets := len(h.Bucket); buckets > p.limits.MaxHistogramBuckets {
 				d.addHistogramBucketsViolation(HistogramBucketsViolation{
 					MetricName: metricName,
@@ -131,5 +157,46 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily) {
 				})
 			}
 		}
+	}
+}
+
+func buildCheckResults(report *Report, limits LimitsConfig) []CheckResult {
+	return []CheckResult{
+		{
+			Type:     CheckTypeMetricNameLength,
+			Limit:    int64(limits.MaxMetricNameLen),
+			Current:  int64(report.maxMetricNameLen),
+			Violated: report.maxMetricNameLen > limits.MaxMetricNameLen,
+		},
+		{
+			Type:     CheckTypeLabelNameLength,
+			Limit:    int64(limits.MaxLabelNameLen),
+			Current:  int64(report.maxLabelNameLen),
+			Violated: report.maxLabelNameLen > limits.MaxLabelNameLen,
+		},
+		{
+			Type:     CheckTypeLabelValueLength,
+			Limit:    int64(limits.MaxLabelValueLen),
+			Current:  int64(report.maxLabelValueLen),
+			Violated: report.maxLabelValueLen > limits.MaxLabelValueLen,
+		},
+		{
+			Type:     CheckTypeCardinality,
+			Limit:    int64(limits.MaxMetricCardinality),
+			Current:  int64(report.maxMetricCardinality),
+			Violated: report.maxMetricCardinality > limits.MaxMetricCardinality,
+		},
+		{
+			Type:     CheckTypeHistogramBuckets,
+			Limit:    int64(limits.MaxHistogramBuckets),
+			Current:  int64(report.maxHistogramBuckets),
+			Violated: report.maxHistogramBuckets > limits.MaxHistogramBuckets,
+		},
+		{
+			Type:     CheckTypeResponseWeight,
+			Limit:    limits.MaxBytesWeight,
+			Current:  report.maxResponseWeight,
+			Violated: report.maxResponseWeight > limits.MaxBytesWeight,
+		},
 	}
 }

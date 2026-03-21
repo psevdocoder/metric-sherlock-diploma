@@ -13,6 +13,7 @@ import (
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/config"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/httpapi"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/leaderelection"
+	"git.server.lan/maksim/metric-sherlock-diploma/internal/outbox"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/storage/postgres"
@@ -21,6 +22,7 @@ import (
 	"git.server.lan/pkg/config/realtimeconfig"
 	"git.server.lan/pkg/zaplogger/logger"
 	"git.server.lan/pkg/zaplogger/zaploggercore"
+	"github.com/segmentio/kafka-go"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
 )
@@ -50,12 +52,55 @@ func main() {
 	pgDsnRaw, _ := config.GetSecret(config.PgDsn)
 	pgDsn, _ := pgDsnRaw.String()
 
-	pgStorage, err := postgres.New(ctx, pgDsn)
+	kafkaBrokersRaw, _ := config.GetValue(config.KafkaBrokers)
+	kafkaBrokersStr, _ := kafkaBrokersRaw.String()
+	kafkaBrokers := strings.Split(kafkaBrokersStr, ",")
+	if len(kafkaBrokers) < 1 {
+		logger.Fatal("Kafka brokers list is empty")
+	}
+
+	kafkaTopicRaw, _ := config.GetValue(config.KafkaViolationsTopic)
+	kafkaTopic, _ := kafkaTopicRaw.String()
+
+	if kafkaTopic == "" {
+		logger.Fatal("Kafka violations topic is empty")
+	}
+
+	pgStorage, err := postgres.New(ctx, pgDsn, kafkaTopic)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 
 	logger.Debug("Connected to database")
+
+	outboxPollIntervalRaw, _ := config.GetValue(config.OutboxPollInterval)
+	outboxPollInterval, _ := outboxPollIntervalRaw.Duration()
+
+	outboxBatchSizeRaw, _ := config.GetValue(config.OutboxBatchSize)
+	outboxBatchSize, _ := outboxBatchSizeRaw.Int()
+
+	outboxMaxRetriesRaw, _ := config.GetValue(config.OutboxMaxRetries)
+	outboxMaxRetries, _ := outboxMaxRetriesRaw.Int()
+
+	kafkaWriter := &kafka.Writer{
+		Addr:         kafka.TCP(kafkaBrokers...),
+		Balancer:     &kafka.Hash{},
+		RequiredAcks: kafka.RequireOne,
+		Async:        false,
+	}
+
+	closer.Add(func() error {
+		return kafkaWriter.Close()
+	})
+
+	outboxRelay := outbox.NewRelay(
+		pgStorage,
+		kafkaWriter,
+		outboxBatchSize,
+		outboxPollInterval,
+		outboxMaxRetries,
+	)
+	go outboxRelay.Run(ctx)
 
 	portRaw, _ := config.GetValue(config.Port)
 	port, _ := portRaw.Int()
@@ -110,6 +155,7 @@ func main() {
 	var elector leaderelection.LeaderElector
 	if env == localEnv {
 		elector = leaderelection.NewLocalElector()
+		logger.Debug("Leader election started provided by local elector")
 	} else {
 		etcdEndpointsRaw, _ := config.GetValue(config.EtcdEndpoints)
 		etcdEndpointsStr, _ := etcdEndpointsRaw.String()
@@ -145,7 +191,7 @@ func main() {
 			logger.Fatal("Failed to create etcd leader elector", zap.Error(err))
 		}
 
-		logger.Debug("Leader election started provided by etcd")
+		logger.Debug("Leader election started provided by etcd elector")
 	}
 
 	go func() {

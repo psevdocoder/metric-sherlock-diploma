@@ -6,6 +6,32 @@ type Report struct {
 	Cluster     string
 	TeamName    string
 	Details     Details
+	Checks      []CheckResult `json:"-"`
+
+	maxMetricNameLen     int
+	maxLabelNameLen      int
+	maxLabelValueLen     int
+	maxMetricCardinality int
+	maxHistogramBuckets  int
+	maxResponseWeight    int64
+}
+
+type CheckType string
+
+const (
+	CheckTypeMetricNameLength CheckType = "metric_name_length"
+	CheckTypeLabelNameLength  CheckType = "label_name_length"
+	CheckTypeLabelValueLength CheckType = "label_value_length"
+	CheckTypeCardinality      CheckType = "cardinality"
+	CheckTypeHistogramBuckets CheckType = "histogram_buckets"
+	CheckTypeResponseWeight   CheckType = "response_weight"
+)
+
+type CheckResult struct {
+	Type     CheckType `json:"-"`
+	Limit    int64     `json:"-"`
+	Current  int64     `json:"-"`
+	Violated bool      `json:"-"`
 }
 
 type MaxStats struct {
