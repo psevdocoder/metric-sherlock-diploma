@@ -1,26 +1,4 @@
-x-etcd-common: &etcd-common
-  image: quay.io/coreos/etcd:v3.5.13
-  command:
-    - etcd
-    - --data-dir=/etcd-data
-    - --log-level=warn
-    - --listen-peer-urls=http://0.0.0.0:2380
-    - --listen-client-urls=http://0.0.0.0:2379
-    - --initial-cluster=etcd1=http://etcd1:2380
-    - --initial-cluster-state=new
-    - --initial-cluster-token=etcd-cluster-1
-
 services:
-  etcd1:
-    <<: *etcd-common
-    container_name: etcd1
-    environment:
-      ETCD_NAME: etcd1
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:2380
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:2379
-    ports:
-      - "23791:2379"
-
   postgres:
     image: postgres:18-alpine
     container_name: postgres
