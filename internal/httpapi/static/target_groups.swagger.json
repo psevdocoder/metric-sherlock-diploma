@@ -1,0 +1,350 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/metricsherlock/targetgroups/v1/target_groups.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TargetGroupsService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/target-groups": {
+      "get": {
+        "operationId": "TargetGroupsService_ListTargetGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTargetGroupsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "team_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
+    "/api/v1/target-groups/{id}": {
+      "get": {
+        "operationId": "TargetGroupsService_GetTargetGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTargetGroupResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CardinalityViolation": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1GetTargetGroupResponse": {
+      "type": "object",
+      "properties": {
+        "targetGroup": {
+          "$ref": "#/definitions/v1TargetGroupDetails"
+        }
+      }
+    },
+    "v1HistogramBucketsViolation": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "buckets": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1LabelNameViolation": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "labelName": {
+          "type": "string"
+        },
+        "length": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1LabelValueViolation": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "labelName": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "length": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ListTargetGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "targetGroups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TargetGroupSummary"
+          }
+        }
+      }
+    },
+    "v1MaxViolationStats": {
+      "type": "object",
+      "properties": {
+        "metricNameTooLong": {
+          "$ref": "#/definitions/v1MetricNameViolation"
+        },
+        "labelNameTooLong": {
+          "$ref": "#/definitions/v1LabelNameViolation"
+        },
+        "labelValueTooLong": {
+          "$ref": "#/definitions/v1LabelValueViolation"
+        },
+        "cardinality": {
+          "$ref": "#/definitions/v1CardinalityViolation"
+        },
+        "histogramBuckets": {
+          "$ref": "#/definitions/v1HistogramBucketsViolation"
+        }
+      }
+    },
+    "v1MetricNameViolation": {
+      "type": "object",
+      "properties": {
+        "metricName": {
+          "type": "string"
+        },
+        "length": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1TargetGroupDetails": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "$ref": "#/definitions/v1TargetGroupSummary"
+        },
+        "violations": {
+          "$ref": "#/definitions/v1ViolationDetails"
+        },
+        "reportCreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1TargetGroupSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "cluster": {
+          "type": "string"
+        },
+        "job": {
+          "type": "string"
+        },
+        "teamName": {
+          "type": "string"
+        },
+        "firstCheck": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastCheck": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "violationStats": {
+          "$ref": "#/definitions/v1ViolationStats"
+        }
+      }
+    },
+    "v1ViolationDetails": {
+      "type": "object",
+      "properties": {
+        "metricNameTooLong": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MetricNameViolation"
+          }
+        },
+        "labelNameTooLong": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LabelNameViolation"
+          }
+        },
+        "labelValueTooLong": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LabelValueViolation"
+          }
+        },
+        "cardinality": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CardinalityViolation"
+          }
+        },
+        "histogramBuckets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1HistogramBucketsViolation"
+          }
+        },
+        "max": {
+          "$ref": "#/definitions/v1MaxViolationStats"
+        },
+        "responseWeight": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ViolationStats": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "metricNameTooLong": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "labelNameTooLong": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "labelValueTooLong": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cardinality": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "histogramBuckets": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "responseWeight": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

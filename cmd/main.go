@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"strings"
 	"syscall"
 	"time"
 
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/config"
+	"git.server.lan/maksim/metric-sherlock-diploma/internal/httpapi"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/leaderelection"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
@@ -44,10 +47,69 @@ func main() {
 	envRaw, _ := config.GetValue(config.Env)
 	env, _ := envRaw.String()
 
+	pgDsnRaw, _ := config.GetSecret(config.PgDsn)
+	pgDsn, _ := pgDsnRaw.String()
+
+	pgStorage, err := postgres.New(ctx, pgDsn)
+	if err != nil {
+		logger.Fatal("Failed to connect to database", zap.Error(err))
+	}
+
+	logger.Debug("Connected to database")
+
+	portRaw, _ := config.GetValue(config.Port)
+	port, _ := portRaw.Int()
+
+	apiHandler, err := httpapi.NewHandler(pgStorage)
+	if err != nil {
+		logger.Fatal("Failed to create HTTP API handler", zap.Error(err))
+	}
+
+	httpServer := &http.Server{
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           apiHandler,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	go func() {
+		logger.Info("HTTP API server starting", zap.String("addr", httpServer.Addr))
+		if serverErr := httpServer.ListenAndServe(); serverErr != nil && !errors.Is(serverErr, http.ErrServerClosed) {
+			logger.Fatal("HTTP API server failed", zap.Error(serverErr))
+		}
+	}()
+
+	closer.Add(func() error {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), gracefulShutdownTimeout)
+		defer cancel()
+		return httpServer.Shutdown(shutdownCtx)
+	})
+
+	cronManager := cron.NewCronManager()
+	closer.Add(func() error {
+		return cronManager.Stop(ctx)
+	})
+
+	limitsConfigRaw, _ := config.GetValue(config.LimitsConfig)
+	limitsConfigStr, _ := limitsConfigRaw.String()
+
+	var limitsConfig scraper.LimitsConfig
+	if err := json.Unmarshal([]byte(limitsConfigStr), &limitsConfig); err != nil {
+		logger.Fatal("Failed to parse limits config", zap.Error(err))
+	}
+
+	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig)
+	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
+	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
+	go taskConsumer.Run(ctx)
+
+	closer.Add(func() error {
+		taskConsumer.Stop()
+		return nil
+	})
+
 	var elector leaderelection.LeaderElector
 	if env == localEnv {
 		elector = leaderelection.NewLocalElector()
-
 	} else {
 		etcdEndpointsRaw, _ := config.GetValue(config.EtcdEndpoints)
 		etcdEndpointsStr, _ := etcdEndpointsRaw.String()
@@ -56,9 +118,22 @@ func main() {
 		etcdClient, err := clientv3.New(clientv3.Config{
 			Endpoints: etcdEndpoints,
 		})
+
 		if err != nil {
-			logger.Fatal("Failed to connect to etcd", zap.Any("endpoints", etcdEndpoints), zap.Error(err))
+			logger.Fatal("Failed to create etcd client", zap.Error(err))
 		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		_, err = etcdClient.Status(ctx, etcdEndpoints[0])
+		if err != nil {
+			logger.Fatal("Failed to connect to etcd",
+				zap.Any("endpoints", etcdEndpoints),
+				zap.Error(err),
+			)
+		}
+
 		logger.Debug("Connected to etcd", zap.Any("endpoints", etcdEndpoints))
 
 		closer.Add(func() error {
@@ -80,44 +155,13 @@ func main() {
 		logger.Debug("Leader election started")
 	}()
 
-	pgDsnRaw, _ := config.GetSecret(config.PgDsn)
-	pgDsn, _ := pgDsnRaw.String()
-
-	pgStorage, err := postgres.New(ctx, pgDsn)
-	if err != nil {
-		logger.Fatal("Failed to connect to database", zap.Error(err))
-	}
-
-	logger.Debug("Connected to database")
-
-	cronManager := cron.NewCronManager()
-	closer.Add(func() error {
-		return cronManager.Stop(ctx)
-	})
-
-	limitsConfigRaw, _ := config.GetValue(config.LimitsConfig)
-	limitsConfigStr, _ := limitsConfigRaw.String()
-
-	var limitsConfig scraper.LimitsConfig
-	if err := json.Unmarshal([]byte(limitsConfigStr), &limitsConfig); err != nil {
-		logger.Fatal("Failed to parse limits config", zap.Error(err))
-	}
-
-	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig)
-	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
-	// инициируем консьюмера с флагом isLeader = true чтобы он не начал сразу брать задачи в обработку,
-	// если под действительно будет лидером
-	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
-	go taskConsumer.Run(ctx)
-
-	closer.Add(func() error {
-		taskConsumer.Stop()
-		return nil
-	})
-
 	elector.AddOnStart(func() {
 		logger.Debug("Handling start leadership")
-		taskConsumer.SetLeader(true)
+
+		// Если запущен локально, то хоть и лидер, но собираем метрики как ведомый
+		if env != localEnv {
+			taskConsumer.SetLeader(true)
+		}
 		cronManager.Start()
 		logger.Info("Started leadership")
 	})
