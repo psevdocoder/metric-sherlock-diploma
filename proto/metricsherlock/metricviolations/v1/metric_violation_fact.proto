@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package metricsherlock.metricviolations.v1;
+
+option go_package = "git.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/metricviolations/v1;metricviolationsv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum ViolationType {
+  VIOLATION_TYPE_UNSPECIFIED = 0;
+  VIOLATION_TYPE_METRIC_NAME_LENGTH = 1;
+  VIOLATION_TYPE_LABEL_NAME_LENGTH = 2;
+  VIOLATION_TYPE_LABEL_VALUE_LENGTH = 3;
+  VIOLATION_TYPE_CARDINALITY = 4;
+  VIOLATION_TYPE_HISTOGRAM_BUCKETS = 5;
+  VIOLATION_TYPE_RESPONSE_WEIGHT = 6;
+}
+
+message ServiceViolationFact {
+  string target_group = 1;
+  string env = 2;
+  string cluster = 3;
+  string team_name = 4;
+
+  ViolationType violation_type = 5;
+  int64 limit = 6;
+  int64 current_value = 7;
+  bool violated = 8;
+
+  google.protobuf.Timestamp checked_at = 9;
+}
