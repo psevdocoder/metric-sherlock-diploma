@@ -44,7 +44,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: metric-sherlock
     volumes:
-      - ./postgres:/var/lib/postgresql
+      - ./data/postgres:/var/lib/postgresql
 
   kafka-permissions:
     image: alpine:3.20
