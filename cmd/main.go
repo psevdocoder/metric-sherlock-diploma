@@ -164,7 +164,7 @@ func main() {
 		logger.Fatal("Failed to parse limits config", zap.Error(err))
 	}
 
-	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig)
+	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig, pgStorage)
 	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
 	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
 	go taskConsumer.Run(ctx)

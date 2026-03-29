@@ -6,7 +6,7 @@ type Report struct {
 	Cluster     string
 	TeamName    string
 	Details     Details
-	Checks      []CheckResult `json:"-"`
+	Checks      []CheckResult
 
 	maxMetricNameLen     int
 	maxLabelNameLen      int
@@ -28,10 +28,11 @@ const (
 )
 
 type CheckResult struct {
-	Type     CheckType `json:"-"`
-	Limit    int64     `json:"-"`
-	Current  int64     `json:"-"`
-	Violated bool      `json:"-"`
+	Type        CheckType `json:"type,omitempty"`
+	Limit       int64     `json:"limit,omitempty"`
+	Current     int64     `json:"current,omitempty"`
+	Violated    bool      `json:"violated,omitempty"`
+	Whitelisted bool      `json:"whitelisted,omitempty"`
 }
 
 type MaxStats struct {
@@ -48,6 +49,7 @@ type Details struct {
 	LabelValueTooLong []LabelValueViolation       `json:"label_value_too_long,omitempty"`
 	Cardinality       []CardinalityViolation      `json:"cardinality,omitempty"`
 	HistogramBuckets  []HistogramBucketsViolation `json:"histogram_buckets,omitempty"`
+	Checks            []CheckResult               `json:"checks,omitempty"`
 
 	Max     *MaxStats     `json:"max,omitempty"`
 	Limits  *CheckLimits  `json:"limits,omitempty"`
@@ -78,6 +80,26 @@ func (d *Details) ensureMax() {
 	if d.Max == nil {
 		d.Max = &MaxStats{}
 	}
+}
+
+func (d *Details) metricNameWhitelistStatus() (hasViolation bool, allWhitelisted bool) {
+	return allWhitelistedMetricNameViolations(d.MetricNameTooLong)
+}
+
+func (d *Details) labelNameWhitelistStatus() (hasViolation bool, allWhitelisted bool) {
+	return allWhitelistedLabelNameViolations(d.LabelNameTooLong)
+}
+
+func (d *Details) labelValueWhitelistStatus() (hasViolation bool, allWhitelisted bool) {
+	return allWhitelistedLabelValueViolations(d.LabelValueTooLong)
+}
+
+func (d *Details) cardinalityWhitelistStatus() (hasViolation bool, allWhitelisted bool) {
+	return allWhitelistedCardinalityViolations(d.Cardinality)
+}
+
+func (d *Details) histogramBucketsWhitelistStatus() (hasViolation bool, allWhitelisted bool) {
+	return allWhitelistedHistogramViolations(d.HistogramBuckets)
 }
 
 func (d *Details) addMetricNameViolation(v MetricNameViolation) {
@@ -196,29 +218,94 @@ func (d *Details) updateMaxHistogram(v HistogramBucketsViolation) {
 }
 
 type MetricNameViolation struct {
-	MetricName string `json:"metric_name,omitempty"`
-	Length     int    `json:"length,omitempty"`
+	MetricName  string `json:"metric_name,omitempty"`
+	Length      int    `json:"length,omitempty"`
+	Whitelisted bool   `json:"whitelisted,omitempty"`
 }
 
 type LabelNameViolation struct {
-	MetricName string `json:"metric_name,omitempty"`
-	LabelName  string `json:"label_name,omitempty"`
-	Length     int    `json:"length,omitempty"`
+	MetricName  string `json:"metric_name,omitempty"`
+	LabelName   string `json:"label_name,omitempty"`
+	Length      int    `json:"length,omitempty"`
+	Whitelisted bool   `json:"whitelisted,omitempty"`
 }
 
 type LabelValueViolation struct {
-	MetricName string `json:"metric_name,omitempty"`
-	LabelName  string `json:"label_name,omitempty"`
-	Value      string `json:"value,omitempty"`
-	Length     int    `json:"length,omitempty"`
+	MetricName  string `json:"metric_name,omitempty"`
+	LabelName   string `json:"label_name,omitempty"`
+	Value       string `json:"value,omitempty"`
+	Length      int    `json:"length,omitempty"`
+	Whitelisted bool   `json:"whitelisted,omitempty"`
 }
 
 type CardinalityViolation struct {
-	MetricName string `json:"metric_name,omitempty"`
-	Value      int    `json:"value,omitempty"`
+	MetricName  string `json:"metric_name,omitempty"`
+	Value       int    `json:"value,omitempty"`
+	Whitelisted bool   `json:"whitelisted,omitempty"`
 }
 
 type HistogramBucketsViolation struct {
-	MetricName string `json:"metric_name,omitempty"`
-	Buckets    int    `json:"buckets,omitempty"`
+	MetricName  string `json:"metric_name,omitempty"`
+	Buckets     int    `json:"buckets,omitempty"`
+	Whitelisted bool   `json:"whitelisted,omitempty"`
+}
+
+func allWhitelistedMetricNameViolations(violations []MetricNameViolation) (bool, bool) {
+	if len(violations) == 0 {
+		return false, false
+	}
+	for _, violation := range violations {
+		if !violation.Whitelisted {
+			return true, false
+		}
+	}
+	return true, true
+}
+
+func allWhitelistedLabelNameViolations(violations []LabelNameViolation) (bool, bool) {
+	if len(violations) == 0 {
+		return false, false
+	}
+	for _, violation := range violations {
+		if !violation.Whitelisted {
+			return true, false
+		}
+	}
+	return true, true
+}
+
+func allWhitelistedLabelValueViolations(violations []LabelValueViolation) (bool, bool) {
+	if len(violations) == 0 {
+		return false, false
+	}
+	for _, violation := range violations {
+		if !violation.Whitelisted {
+			return true, false
+		}
+	}
+	return true, true
+}
+
+func allWhitelistedCardinalityViolations(violations []CardinalityViolation) (bool, bool) {
+	if len(violations) == 0 {
+		return false, false
+	}
+	for _, violation := range violations {
+		if !violation.Whitelisted {
+			return true, false
+		}
+	}
+	return true, true
+}
+
+func allWhitelistedHistogramViolations(violations []HistogramBucketsViolation) (bool, bool) {
+	if len(violations) == 0 {
+		return false, false
+	}
+	for _, violation := range violations {
+		if !violation.Whitelisted {
+			return true, false
+		}
+	}
+	return true, true
 }

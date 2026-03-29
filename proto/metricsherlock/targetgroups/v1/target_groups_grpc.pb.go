@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,8 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TargetGroupsService_ListTargetGroups_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetGroups"
-	TargetGroupsService_GetTargetGroup_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetTargetGroup"
+	TargetGroupsService_ListTargetGroups_FullMethodName      = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetGroups"
+	TargetGroupsService_GetTargetGroup_FullMethodName        = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetTargetGroup"
+	TargetGroupsService_ListMetricWhitelist_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListMetricWhitelist"
+	TargetGroupsService_UpsertMetricWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertMetricWhitelist"
+	TargetGroupsService_DeleteMetricWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteMetricWhitelist"
+	TargetGroupsService_ListTargetWhitelist_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetWhitelist"
+	TargetGroupsService_UpsertTargetWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertTargetWhitelist"
+	TargetGroupsService_DeleteTargetWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteTargetWhitelist"
 )
 
 // TargetGroupsServiceClient is the client API for TargetGroupsService service.
@@ -29,6 +36,12 @@ const (
 type TargetGroupsServiceClient interface {
 	ListTargetGroups(ctx context.Context, in *ListTargetGroupsRequest, opts ...grpc.CallOption) (*ListTargetGroupsResponse, error)
 	GetTargetGroup(ctx context.Context, in *GetTargetGroupRequest, opts ...grpc.CallOption) (*GetTargetGroupResponse, error)
+	ListMetricWhitelist(ctx context.Context, in *ListMetricWhitelistRequest, opts ...grpc.CallOption) (*ListMetricWhitelistResponse, error)
+	UpsertMetricWhitelist(ctx context.Context, in *UpsertMetricWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteMetricWhitelist(ctx context.Context, in *DeleteMetricWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListTargetWhitelist(ctx context.Context, in *ListTargetWhitelistRequest, opts ...grpc.CallOption) (*ListTargetWhitelistResponse, error)
+	UpsertTargetWhitelist(ctx context.Context, in *UpsertTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTargetWhitelist(ctx context.Context, in *DeleteTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type targetGroupsServiceClient struct {
@@ -59,12 +72,78 @@ func (c *targetGroupsServiceClient) GetTargetGroup(ctx context.Context, in *GetT
 	return out, nil
 }
 
+func (c *targetGroupsServiceClient) ListMetricWhitelist(ctx context.Context, in *ListMetricWhitelistRequest, opts ...grpc.CallOption) (*ListMetricWhitelistResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMetricWhitelistResponse)
+	err := c.cc.Invoke(ctx, TargetGroupsService_ListMetricWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) UpsertMetricWhitelist(ctx context.Context, in *UpsertMetricWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_UpsertMetricWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) DeleteMetricWhitelist(ctx context.Context, in *DeleteMetricWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_DeleteMetricWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) ListTargetWhitelist(ctx context.Context, in *ListTargetWhitelistRequest, opts ...grpc.CallOption) (*ListTargetWhitelistResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTargetWhitelistResponse)
+	err := c.cc.Invoke(ctx, TargetGroupsService_ListTargetWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) UpsertTargetWhitelist(ctx context.Context, in *UpsertTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_UpsertTargetWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) DeleteTargetWhitelist(ctx context.Context, in *DeleteTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_DeleteTargetWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TargetGroupsServiceServer is the server API for TargetGroupsService service.
 // All implementations must embed UnimplementedTargetGroupsServiceServer
 // for forward compatibility.
 type TargetGroupsServiceServer interface {
 	ListTargetGroups(context.Context, *ListTargetGroupsRequest) (*ListTargetGroupsResponse, error)
 	GetTargetGroup(context.Context, *GetTargetGroupRequest) (*GetTargetGroupResponse, error)
+	ListMetricWhitelist(context.Context, *ListMetricWhitelistRequest) (*ListMetricWhitelistResponse, error)
+	UpsertMetricWhitelist(context.Context, *UpsertMetricWhitelistRequest) (*emptypb.Empty, error)
+	DeleteMetricWhitelist(context.Context, *DeleteMetricWhitelistRequest) (*emptypb.Empty, error)
+	ListTargetWhitelist(context.Context, *ListTargetWhitelistRequest) (*ListTargetWhitelistResponse, error)
+	UpsertTargetWhitelist(context.Context, *UpsertTargetWhitelistRequest) (*emptypb.Empty, error)
+	DeleteTargetWhitelist(context.Context, *DeleteTargetWhitelistRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTargetGroupsServiceServer()
 }
 
@@ -80,6 +159,24 @@ func (UnimplementedTargetGroupsServiceServer) ListTargetGroups(context.Context, 
 }
 func (UnimplementedTargetGroupsServiceServer) GetTargetGroup(context.Context, *GetTargetGroupRequest) (*GetTargetGroupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTargetGroup not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) ListMetricWhitelist(context.Context, *ListMetricWhitelistRequest) (*ListMetricWhitelistResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMetricWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) UpsertMetricWhitelist(context.Context, *UpsertMetricWhitelistRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertMetricWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) DeleteMetricWhitelist(context.Context, *DeleteMetricWhitelistRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteMetricWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) ListTargetWhitelist(context.Context, *ListTargetWhitelistRequest) (*ListTargetWhitelistResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListTargetWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) UpsertTargetWhitelist(context.Context, *UpsertTargetWhitelistRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertTargetWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) DeleteTargetWhitelist(context.Context, *DeleteTargetWhitelistRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteTargetWhitelist not implemented")
 }
 func (UnimplementedTargetGroupsServiceServer) mustEmbedUnimplementedTargetGroupsServiceServer() {}
 func (UnimplementedTargetGroupsServiceServer) testEmbeddedByValue()                             {}
@@ -138,6 +235,114 @@ func _TargetGroupsService_GetTargetGroup_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TargetGroupsService_ListMetricWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMetricWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).ListMetricWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_ListMetricWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).ListMetricWhitelist(ctx, req.(*ListMetricWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_UpsertMetricWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertMetricWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).UpsertMetricWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_UpsertMetricWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).UpsertMetricWhitelist(ctx, req.(*UpsertMetricWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_DeleteMetricWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteMetricWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).DeleteMetricWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_DeleteMetricWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).DeleteMetricWhitelist(ctx, req.(*DeleteMetricWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_ListTargetWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTargetWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).ListTargetWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_ListTargetWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).ListTargetWhitelist(ctx, req.(*ListTargetWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_UpsertTargetWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertTargetWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).UpsertTargetWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_UpsertTargetWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).UpsertTargetWhitelist(ctx, req.(*UpsertTargetWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_DeleteTargetWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTargetWhitelistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).DeleteTargetWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_DeleteTargetWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).DeleteTargetWhitelist(ctx, req.(*DeleteTargetWhitelistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TargetGroupsService_ServiceDesc is the grpc.ServiceDesc for TargetGroupsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +357,30 @@ var TargetGroupsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTargetGroup",
 			Handler:    _TargetGroupsService_GetTargetGroup_Handler,
+		},
+		{
+			MethodName: "ListMetricWhitelist",
+			Handler:    _TargetGroupsService_ListMetricWhitelist_Handler,
+		},
+		{
+			MethodName: "UpsertMetricWhitelist",
+			Handler:    _TargetGroupsService_UpsertMetricWhitelist_Handler,
+		},
+		{
+			MethodName: "DeleteMetricWhitelist",
+			Handler:    _TargetGroupsService_DeleteMetricWhitelist_Handler,
+		},
+		{
+			MethodName: "ListTargetWhitelist",
+			Handler:    _TargetGroupsService_ListTargetWhitelist_Handler,
+		},
+		{
+			MethodName: "UpsertTargetWhitelist",
+			Handler:    _TargetGroupsService_UpsertTargetWhitelist_Handler,
+		},
+		{
+			MethodName: "DeleteTargetWhitelist",
+			Handler:    _TargetGroupsService_DeleteTargetWhitelist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -11,12 +11,19 @@ import (
 	"github.com/jackc/pgx/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type targetGroupStorage interface {
 	ListTargetGroups(ctx context.Context, teamName string) ([]*postgres.TargetGroupWithReport, error)
 	GetTargetGroupByID(ctx context.Context, id int64) (*postgres.TargetGroupWithReport, error)
+	ListMetricWhitelist(ctx context.Context, targetGroup, env string) ([]scraper.MetricWhitelistRule, error)
+	UpsertMetricWhitelist(ctx context.Context, item scraper.MetricWhitelistRule) error
+	DeleteMetricWhitelist(ctx context.Context, targetGroup, env, metricName string) error
+	ListTargetWhitelist(ctx context.Context, targetGroup, env string) ([]scraper.TargetWhitelistRule, error)
+	UpsertTargetWhitelist(ctx context.Context, item scraper.TargetWhitelistRule) error
+	DeleteTargetWhitelist(ctx context.Context, targetGroup, env string) error
 }
 
 type targetGroupsService struct {
@@ -71,6 +78,144 @@ func (s *targetGroupsService) GetTargetGroup(
 			ReportCreatedAt: toTimestamp(targetGroup.ReportCreatedAt),
 		},
 	}, nil
+}
+
+func (s *targetGroupsService) ListMetricWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.ListMetricWhitelistRequest,
+) (*targetgroupsv1.ListMetricWhitelistResponse, error) {
+	items, err := s.storage.ListMetricWhitelist(ctx, req.GetTargetGroup(), req.GetEnv())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to load metric whitelist")
+	}
+
+	resp := &targetgroupsv1.ListMetricWhitelistResponse{
+		Items: make([]*targetgroupsv1.MetricWhitelistItem, 0, len(items)),
+	}
+	for _, item := range items {
+		resp.Items = append(resp.Items, toMetricWhitelistItem(item))
+	}
+
+	return resp, nil
+}
+
+func (s *targetGroupsService) UpsertMetricWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.UpsertMetricWhitelistRequest,
+) (*emptypb.Empty, error) {
+	item := req.GetItem()
+	if item == nil {
+		return nil, status.Error(codes.InvalidArgument, "item is required")
+	}
+
+	if item.GetTargetGroup() == "" {
+		return nil, status.Error(codes.InvalidArgument, "target_group is required")
+	}
+	if item.GetEnv() == "" {
+		return nil, status.Error(codes.InvalidArgument, "env is required")
+	}
+	if item.GetMetricName() == "" {
+		return nil, status.Error(codes.InvalidArgument, "metric_name is required")
+	}
+
+	checks := fromMetricWhitelistChecks(item.GetChecks())
+	if len(checks) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "at least one positive check limit is required")
+	}
+
+	err := s.storage.UpsertMetricWhitelist(ctx, scraper.MetricWhitelistRule{
+		TargetGroup: item.GetTargetGroup(),
+		Env:         item.GetEnv(),
+		MetricName:  item.GetMetricName(),
+		Checks:      checks,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to save metric whitelist")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *targetGroupsService) DeleteMetricWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.DeleteMetricWhitelistRequest,
+) (*emptypb.Empty, error) {
+	if req.GetTargetGroup() == "" || req.GetEnv() == "" || req.GetMetricName() == "" {
+		return nil, status.Error(codes.InvalidArgument, "target_group, env and metric_name are required")
+	}
+
+	if err := s.storage.DeleteMetricWhitelist(ctx, req.GetTargetGroup(), req.GetEnv(), req.GetMetricName()); err != nil {
+		return nil, status.Error(codes.Internal, "failed to delete metric whitelist")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *targetGroupsService) ListTargetWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.ListTargetWhitelistRequest,
+) (*targetgroupsv1.ListTargetWhitelistResponse, error) {
+	items, err := s.storage.ListTargetWhitelist(ctx, req.GetTargetGroup(), req.GetEnv())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to load target whitelist")
+	}
+
+	resp := &targetgroupsv1.ListTargetWhitelistResponse{
+		Items: make([]*targetgroupsv1.TargetWhitelistItem, 0, len(items)),
+	}
+	for _, item := range items {
+		resp.Items = append(resp.Items, toTargetWhitelistItem(item))
+	}
+
+	return resp, nil
+}
+
+func (s *targetGroupsService) UpsertTargetWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.UpsertTargetWhitelistRequest,
+) (*emptypb.Empty, error) {
+	item := req.GetItem()
+	if item == nil {
+		return nil, status.Error(codes.InvalidArgument, "item is required")
+	}
+
+	if item.GetTargetGroup() == "" {
+		return nil, status.Error(codes.InvalidArgument, "target_group is required")
+	}
+	if item.GetEnv() == "" {
+		return nil, status.Error(codes.InvalidArgument, "env is required")
+	}
+
+	checks := fromTargetWhitelistChecks(item.GetChecks())
+	if len(checks) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "at least one check must be enabled")
+	}
+
+	err := s.storage.UpsertTargetWhitelist(ctx, scraper.TargetWhitelistRule{
+		TargetGroup: item.GetTargetGroup(),
+		Env:         item.GetEnv(),
+		Checks:      checks,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to save target whitelist")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *targetGroupsService) DeleteTargetWhitelist(
+	ctx context.Context,
+	req *targetgroupsv1.DeleteTargetWhitelistRequest,
+) (*emptypb.Empty, error) {
+	if req.GetTargetGroup() == "" || req.GetEnv() == "" {
+		return nil, status.Error(codes.InvalidArgument, "target_group and env are required")
+	}
+
+	if err := s.storage.DeleteTargetWhitelist(ctx, req.GetTargetGroup(), req.GetEnv()); err != nil {
+		return nil, status.Error(codes.Internal, "failed to delete target whitelist")
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
 func toTargetGroupSummary(group *postgres.TargetGroupWithReport) *targetgroupsv1.TargetGroupSummary {
@@ -191,6 +336,10 @@ func toViolationDetails(details scraper.Details) *targetgroupsv1.ViolationDetail
 }
 
 func toCheckMetrics(details scraper.Details) *targetgroupsv1.CheckMetrics {
+	if len(details.Checks) > 0 {
+		return toCheckMetricsFromResults(details.Checks)
+	}
+
 	if details.Limits == nil && details.Current == nil {
 		return nil
 	}
@@ -202,6 +351,37 @@ func toCheckMetrics(details scraper.Details) *targetgroupsv1.CheckMetrics {
 		Cardinality:      toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.Cardinality }, func(c *scraper.CheckCurrent) int64 { return c.Cardinality }),
 		HistogramBuckets: toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.HistogramBuckets }, func(c *scraper.CheckCurrent) int64 { return c.HistogramBuckets }),
 		ResponseWeight:   toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.ResponseWeight }, func(c *scraper.CheckCurrent) int64 { return c.ResponseWeight }),
+	}
+}
+
+func toCheckMetricsFromResults(checks []scraper.CheckResult) *targetgroupsv1.CheckMetrics {
+	byType := make(map[scraper.CheckType]scraper.CheckResult, len(checks))
+	for _, check := range checks {
+		byType[check.Type] = check
+	}
+
+	return &targetgroupsv1.CheckMetrics{
+		MetricNameLength: toCheckMetricFromResult(byType, scraper.CheckTypeMetricNameLength),
+		LabelNameLength:  toCheckMetricFromResult(byType, scraper.CheckTypeLabelNameLength),
+		LabelValueLength: toCheckMetricFromResult(byType, scraper.CheckTypeLabelValueLength),
+		Cardinality:      toCheckMetricFromResult(byType, scraper.CheckTypeCardinality),
+		HistogramBuckets: toCheckMetricFromResult(byType, scraper.CheckTypeHistogramBuckets),
+		ResponseWeight:   toCheckMetricFromResult(byType, scraper.CheckTypeResponseWeight),
+	}
+}
+
+func toCheckMetricFromResult(
+	byType map[scraper.CheckType]scraper.CheckResult,
+	checkType scraper.CheckType,
+) *targetgroupsv1.CheckMetric {
+	check, ok := byType[checkType]
+	if !ok {
+		return nil
+	}
+
+	return &targetgroupsv1.CheckMetric{
+		Limit:   check.Limit,
+		Current: check.Current,
 	}
 }
 
@@ -241,4 +421,111 @@ func toTimestamp(value *time.Time) *timestamppb.Timestamp {
 		return nil
 	}
 	return timestamppb.New(*value)
+}
+
+func toMetricWhitelistItem(item scraper.MetricWhitelistRule) *targetgroupsv1.MetricWhitelistItem {
+	return &targetgroupsv1.MetricWhitelistItem{
+		TargetGroup: item.TargetGroup,
+		Env:         item.Env,
+		MetricName:  item.MetricName,
+		Checks:      toMetricWhitelistChecks(item.Checks),
+	}
+}
+
+func toMetricWhitelistChecks(checks map[scraper.CheckType]int64) *targetgroupsv1.MetricWhitelistChecks {
+	if len(checks) == 0 {
+		return nil
+	}
+
+	resp := &targetgroupsv1.MetricWhitelistChecks{}
+	resp.MetricNameLength = checks[scraper.CheckTypeMetricNameLength]
+	resp.LabelNameLength = checks[scraper.CheckTypeLabelNameLength]
+	resp.LabelValueLength = checks[scraper.CheckTypeLabelValueLength]
+	resp.Cardinality = checks[scraper.CheckTypeCardinality]
+	resp.HistogramBuckets = checks[scraper.CheckTypeHistogramBuckets]
+	return resp
+}
+
+func fromMetricWhitelistChecks(checks *targetgroupsv1.MetricWhitelistChecks) map[scraper.CheckType]int64 {
+	if checks == nil {
+		return nil
+	}
+
+	resp := make(map[scraper.CheckType]int64, 5)
+	if value := checks.GetMetricNameLength(); value > 0 {
+		resp[scraper.CheckTypeMetricNameLength] = value
+	}
+	if value := checks.GetLabelNameLength(); value > 0 {
+		resp[scraper.CheckTypeLabelNameLength] = value
+	}
+	if value := checks.GetLabelValueLength(); value > 0 {
+		resp[scraper.CheckTypeLabelValueLength] = value
+	}
+	if value := checks.GetCardinality(); value > 0 {
+		resp[scraper.CheckTypeCardinality] = value
+	}
+	if value := checks.GetHistogramBuckets(); value > 0 {
+		resp[scraper.CheckTypeHistogramBuckets] = value
+	}
+	return resp
+}
+
+func toTargetWhitelistItem(item scraper.TargetWhitelistRule) *targetgroupsv1.TargetWhitelistItem {
+	return &targetgroupsv1.TargetWhitelistItem{
+		TargetGroup: item.TargetGroup,
+		Env:         item.Env,
+		Checks:      toTargetWhitelistChecks(item.Checks),
+	}
+}
+
+func toTargetWhitelistChecks(checks []scraper.CheckType) *targetgroupsv1.TargetWhitelistChecks {
+	if len(checks) == 0 {
+		return nil
+	}
+
+	resp := &targetgroupsv1.TargetWhitelistChecks{}
+	for _, checkType := range checks {
+		switch checkType {
+		case scraper.CheckTypeMetricNameLength:
+			resp.MetricNameLength = true
+		case scraper.CheckTypeLabelNameLength:
+			resp.LabelNameLength = true
+		case scraper.CheckTypeLabelValueLength:
+			resp.LabelValueLength = true
+		case scraper.CheckTypeCardinality:
+			resp.Cardinality = true
+		case scraper.CheckTypeHistogramBuckets:
+			resp.HistogramBuckets = true
+		case scraper.CheckTypeResponseWeight:
+			resp.ResponseWeight = true
+		}
+	}
+	return resp
+}
+
+func fromTargetWhitelistChecks(checks *targetgroupsv1.TargetWhitelistChecks) []scraper.CheckType {
+	if checks == nil {
+		return nil
+	}
+
+	resp := make([]scraper.CheckType, 0, 6)
+	if checks.GetMetricNameLength() {
+		resp = append(resp, scraper.CheckTypeMetricNameLength)
+	}
+	if checks.GetLabelNameLength() {
+		resp = append(resp, scraper.CheckTypeLabelNameLength)
+	}
+	if checks.GetLabelValueLength() {
+		resp = append(resp, scraper.CheckTypeLabelValueLength)
+	}
+	if checks.GetCardinality() {
+		resp = append(resp, scraper.CheckTypeCardinality)
+	}
+	if checks.GetHistogramBuckets() {
+		resp = append(resp, scraper.CheckTypeHistogramBuckets)
+	}
+	if checks.GetResponseWeight() {
+		resp = append(resp, scraper.CheckTypeResponseWeight)
+	}
+	return resp
 }

@@ -78,7 +78,7 @@ func (s *Storage) buildViolationOutboxEvents(report *scraper.Report, createdAt t
 	events := make([]outboxEvent, 0, len(report.Checks))
 
 	for _, check := range report.Checks {
-		if !check.Violated {
+		if !check.Violated || check.Whitelisted {
 			continue
 		}
 

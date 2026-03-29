@@ -5,6 +5,7 @@ package metricsherlock.targetgroups.v1;
 option go_package = "git.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/targetgroups/v1;targetgroupsv1";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 service TargetGroupsService {
@@ -17,6 +18,44 @@ service TargetGroupsService {
   rpc GetTargetGroup(GetTargetGroupRequest) returns (GetTargetGroupResponse) {
     option (google.api.http) = {
       get: "/api/v1/target-groups/{id}"
+    };
+  }
+
+  rpc ListMetricWhitelist(ListMetricWhitelistRequest) returns (ListMetricWhitelistResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/whitelist/metrics"
+    };
+  }
+
+  rpc UpsertMetricWhitelist(UpsertMetricWhitelistRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/whitelist/metrics"
+      body: "*"
+    };
+  }
+
+  rpc DeleteMetricWhitelist(DeleteMetricWhitelistRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/whitelist/metrics/{target_group}/{env}/{metric_name}"
+    };
+  }
+
+  rpc ListTargetWhitelist(ListTargetWhitelistRequest) returns (ListTargetWhitelistResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/whitelist/targets"
+    };
+  }
+
+  rpc UpsertTargetWhitelist(UpsertTargetWhitelistRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/whitelist/targets"
+      body: "*"
+    };
+  }
+
+  rpc DeleteTargetWhitelist(DeleteTargetWhitelistRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/whitelist/targets/{target_group}/{env}"
     };
   }
 }
@@ -35,6 +74,73 @@ message GetTargetGroupRequest {
 
 message GetTargetGroupResponse {
   TargetGroupDetails target_group = 1;
+}
+
+message ListMetricWhitelistRequest {
+  string target_group = 1;
+  string env = 2;
+}
+
+message ListMetricWhitelistResponse {
+  repeated MetricWhitelistItem items = 1;
+}
+
+message UpsertMetricWhitelistRequest {
+  MetricWhitelistItem item = 1;
+}
+
+message DeleteMetricWhitelistRequest {
+  string target_group = 1;
+  string env = 2;
+  string metric_name = 3;
+}
+
+message MetricWhitelistItem {
+  string target_group = 1;
+  string env = 2;
+  string metric_name = 3;
+  MetricWhitelistChecks checks = 4;
+}
+
+message MetricWhitelistChecks {
+  int64 metric_name_length = 1;
+  int64 label_name_length = 2;
+  int64 label_value_length = 3;
+  int64 cardinality = 4;
+  int64 histogram_buckets = 5;
+}
+
+message ListTargetWhitelistRequest {
+  string target_group = 1;
+  string env = 2;
+}
+
+message ListTargetWhitelistResponse {
+  repeated TargetWhitelistItem items = 1;
+}
+
+message UpsertTargetWhitelistRequest {
+  TargetWhitelistItem item = 1;
+}
+
+message DeleteTargetWhitelistRequest {
+  string target_group = 1;
+  string env = 2;
+}
+
+message TargetWhitelistItem {
+  string target_group = 1;
+  string env = 2;
+  TargetWhitelistChecks checks = 3;
+}
+
+message TargetWhitelistChecks {
+  bool metric_name_length = 1;
+  bool label_name_length = 2;
+  bool label_value_length = 3;
+  bool cardinality = 4;
+  bool histogram_buckets = 5;
+  bool response_weight = 6;
 }
 
 message TargetGroupDetails {

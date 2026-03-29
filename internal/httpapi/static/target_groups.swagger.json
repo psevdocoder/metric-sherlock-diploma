@@ -76,6 +76,220 @@
           "TargetGroupsService"
         ]
       }
+    },
+    "/api/v1/whitelist/metrics": {
+      "get": {
+        "operationId": "TargetGroupsService_ListMetricWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMetricWhitelistResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetGroup",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "env",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      },
+      "put": {
+        "operationId": "TargetGroupsService_UpsertMetricWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertMetricWhitelistRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
+    "/api/v1/whitelist/metrics/{targetGroup}/{env}/{metricName}": {
+      "delete": {
+        "operationId": "TargetGroupsService_DeleteMetricWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetGroup",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "env",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "metricName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
+    "/api/v1/whitelist/targets": {
+      "get": {
+        "operationId": "TargetGroupsService_ListTargetWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTargetWhitelistResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetGroup",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "env",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      },
+      "put": {
+        "operationId": "TargetGroupsService_UpsertTargetWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertTargetWhitelistRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
+    "/api/v1/whitelist/targets/{targetGroup}/{env}": {
+      "delete": {
+        "operationId": "TargetGroupsService_DeleteTargetWhitelist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "targetGroup",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "env",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -208,6 +422,18 @@
         }
       }
     },
+    "v1ListMetricWhitelistResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MetricWhitelistItem"
+          }
+        }
+      }
+    },
     "v1ListTargetGroupsResponse": {
       "type": "object",
       "properties": {
@@ -216,6 +442,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1TargetGroupSummary"
+          }
+        }
+      }
+    },
+    "v1ListTargetWhitelistResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TargetWhitelistItem"
           }
         }
       }
@@ -249,6 +487,48 @@
         "length": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "v1MetricWhitelistChecks": {
+      "type": "object",
+      "properties": {
+        "metricNameLength": {
+          "type": "string",
+          "format": "int64"
+        },
+        "labelNameLength": {
+          "type": "string",
+          "format": "int64"
+        },
+        "labelValueLength": {
+          "type": "string",
+          "format": "int64"
+        },
+        "cardinality": {
+          "type": "string",
+          "format": "int64"
+        },
+        "histogramBuckets": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1MetricWhitelistItem": {
+      "type": "object",
+      "properties": {
+        "targetGroup": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "metricName": {
+          "type": "string"
+        },
+        "checks": {
+          "$ref": "#/definitions/v1MetricWhitelistChecks"
         }
       }
     },
@@ -299,6 +579,59 @@
         },
         "violationStats": {
           "$ref": "#/definitions/v1ViolationStats"
+        }
+      }
+    },
+    "v1TargetWhitelistChecks": {
+      "type": "object",
+      "properties": {
+        "metricNameLength": {
+          "type": "boolean"
+        },
+        "labelNameLength": {
+          "type": "boolean"
+        },
+        "labelValueLength": {
+          "type": "boolean"
+        },
+        "cardinality": {
+          "type": "boolean"
+        },
+        "histogramBuckets": {
+          "type": "boolean"
+        },
+        "responseWeight": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1TargetWhitelistItem": {
+      "type": "object",
+      "properties": {
+        "targetGroup": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "checks": {
+          "$ref": "#/definitions/v1TargetWhitelistChecks"
+        }
+      }
+    },
+    "v1UpsertMetricWhitelistRequest": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/v1MetricWhitelistItem"
+        }
+      }
+    },
+    "v1UpsertTargetWhitelistRequest": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/v1TargetWhitelistItem"
         }
       }
     },
