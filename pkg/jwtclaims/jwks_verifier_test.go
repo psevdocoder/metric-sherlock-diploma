@@ -145,6 +145,40 @@ func TestJWKSVerifierParseAndValidateInvalidSignature(t *testing.T) {
 	}
 }
 
+func TestNewJWKSVerifierUsesIssuerJWKSWhenEndpointPlaceholder(t *testing.T) {
+	issuer := "http://localhost:8080/realms/local"
+
+	verifier, err := NewJWKSVerifier(Config{
+		Issuer:       issuer,
+		JWKSEndpoint: "string",
+	})
+	if err != nil {
+		t.Fatalf("unexpected constructor error: %v", err)
+	}
+
+	jwksVerifier, ok := verifier.(*jwksVerifier)
+	if !ok {
+		t.Fatalf("unexpected verifier type: %T", verifier)
+	}
+
+	if got, want := jwksVerifier.jwksEndpoint, issuer+"/protocol/openid-connect/certs"; got != want {
+		t.Fatalf("unexpected jwks endpoint: got %q, want %q", got, want)
+	}
+}
+
+func TestNewJWKSVerifierInvalidJWKSEndpoint(t *testing.T) {
+	_, err := NewJWKSVerifier(Config{
+		Issuer:       "http://localhost:8080/realms/local",
+		JWKSEndpoint: "invalid-endpoint",
+	})
+	if err == nil {
+		t.Fatal("expected constructor error")
+	}
+	if !errors.Is(err, ErrTokenInvalidClaims) {
+		t.Fatalf("expected ErrTokenInvalidClaims, got %v", err)
+	}
+}
+
 func generatePrivateKey(t *testing.T) *rsa.PrivateKey {
 	t.Helper()
 

@@ -11,6 +11,7 @@ import (
 	"io"
 	"math/big"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -51,9 +52,9 @@ func NewJWKSVerifier(cfg Config) (Verifier, error) {
 		return nil, errorsJoin(ErrTokenInvalidClaims, fmt.Errorf("issuer is required"))
 	}
 
-	jwksEndpoint := strings.TrimSpace(cfg.JWKSEndpoint)
-	if jwksEndpoint == "" {
-		jwksEndpoint = issuer + "/protocol/openid-connect/certs"
+	jwksEndpoint, err := resolveJWKSEndpoint(issuer, cfg.JWKSEndpoint)
+	if err != nil {
+		return nil, err
 	}
 
 	clockSkew := cfg.ClockSkew
@@ -80,6 +81,23 @@ func NewJWKSVerifier(cfg Config) (Verifier, error) {
 		httpClient:   httpClient,
 		keysByKid:    make(map[string]*rsa.PublicKey),
 	}, nil
+}
+
+func resolveJWKSEndpoint(issuer, rawEndpoint string) (string, error) {
+	endpoint := strings.TrimSpace(rawEndpoint)
+	if endpoint == "" || strings.EqualFold(endpoint, "string") {
+		return issuer + "/protocol/openid-connect/certs", nil
+	}
+
+	parsed, err := url.Parse(endpoint)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return "", errorsJoin(ErrTokenInvalidClaims, fmt.Errorf("invalid jwks endpoint %q", endpoint))
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return "", errorsJoin(ErrTokenInvalidClaims, fmt.Errorf("invalid jwks endpoint scheme %q", parsed.Scheme))
+	}
+
+	return endpoint, nil
 }
 
 func (v *jwksVerifier) ParseAndValidate(ctx context.Context, rawToken string) (*Claims, error) {

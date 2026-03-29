@@ -127,7 +127,7 @@ func main() {
 		logger.Fatal("Failed to initialize JWT verifier", zap.Error(err))
 	}
 
-	apiHandler, err := httpapi.NewHandler(pgStorage, jwtVerifier)
+	apiHandler, err := httpapi.NewHandler(pgStorage, jwtVerifier, jwtIssuer, jwtExpectedAZP)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP API handler", zap.Error(err))
 	}
