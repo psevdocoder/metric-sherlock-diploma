@@ -116,20 +116,20 @@ func main() {
 	portRaw, _ := config.GetValue(config.Port)
 	port, _ := portRaw.Int()
 
-	jwtIssuerRaw, _ := config.GetValue(config.JWTIssuer)
-	jwtIssuer, _ := jwtIssuerRaw.String()
-	if jwtIssuer == "" {
-		logger.Fatal("JWT issuer is empty")
+	jwtIssuerInternalRaw, _ := config.GetValue(config.JwtIssuerInternal)
+	jwtIssuerInternal, _ := jwtIssuerInternalRaw.String()
+	if jwtIssuerInternal == "" {
+		logger.Fatal("JWT issuer internal is empty")
 	}
 
-	jwtJWKSEndpointRaw, _ := config.GetValue(config.JWTJWKSEndpoint)
+	jwtJWKSEndpointRaw, _ := config.GetValue(config.JwtJwksEndpoint)
 	jwtJWKSEndpoint, _ := jwtJWKSEndpointRaw.String()
 
-	jwtExpectedAZPRaw, _ := config.GetValue(config.JWTExpectedAZP)
+	jwtExpectedAZPRaw, _ := config.GetValue(config.JwtExpectedAzp)
 	jwtExpectedAZP, _ := jwtExpectedAZPRaw.String()
 
 	jwtVerifier, err := jwtclaims.NewJWKSVerifier(jwtclaims.Config{
-		Issuer:       jwtIssuer,
+		Issuer:       jwtIssuerInternal,
 		JWKSEndpoint: jwtJWKSEndpoint,
 		ExpectedAZP:  jwtExpectedAZP,
 	})
@@ -224,7 +224,13 @@ func main() {
 		return nil
 	})
 
-	apiHandler, err := httpapi.NewHandler(pgStorage, runtimeSettingsService, jwtVerifier, jwtIssuer, jwtExpectedAZP)
+	jwtIssuerPublicRaw, _ := config.GetValue(config.JwtIssuerPublic)
+	jwtIssuerPublic, _ := jwtIssuerPublicRaw.String()
+	if jwtIssuerPublic == "" {
+		logger.Fatal("JWT issuer public is empty")
+	}
+
+	apiHandler, err := httpapi.NewHandler(pgStorage, runtimeSettingsService, jwtVerifier, jwtIssuerPublic, jwtExpectedAZP)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP API handler", zap.Error(err))
 	}

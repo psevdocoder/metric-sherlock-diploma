@@ -1,0 +1,190 @@
+x-kafka-common: &kafka-common
+  image: confluentinc/cp-kafka:7.5.0
+  restart: unless-stopped
+  environment:
+    # --- KRaft ---
+    KAFKA_ENABLE_KRAFT: "yes"
+    KAFKA_PROCESS_ROLES: broker,controller
+    KAFKA_NODE_ID: 1
+    CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+    # --- Networking ---
+    KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+    KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092,CONTROLLER://0.0.0.0:9093
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,EXTERNAL://localhost:19092
+
+    # --- KRaft quorum ---
+    KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9093
+
+    # --- single node ---
+    KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+    KAFKA_MIN_INSYNC_REPLICAS: 1
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+    # --- misc ---
+    KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+    KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    KAFKA_LOG_DIRS: /var/lib/kafka/data
+    KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+x-etcd-common: &etcd-common
+  image: quay.io/coreos/etcd:v3.5.13
+  command:
+    - etcd
+    - --data-dir=/etcd-data
+    - --log-level=warn
+    - --listen-peer-urls=http://0.0.0.0:2380
+    - --listen-client-urls=http://0.0.0.0:2379
+    - --initial-cluster=etcd1=http://etcd1:2380
+    - --initial-cluster-state=new
+    - --initial-cluster-token=etcd-cluster-1
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: metric-sherlock
+    volumes:
+      - ./data/postgres:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d metric-sherlock" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka-permissions:
+    image: alpine:3.20
+    container_name: kafka-permissions
+    command: >
+      sh -c "
+        mkdir -p /var/lib/kafka/data &&
+        chown -R 1000:1000 /var/lib/kafka/data
+      "
+    volumes:
+      - ./data/kafka1:/var/lib/kafka/data
+    restart: "no"
+
+  kafka1:
+    <<: *kafka-common
+    container_name: kafka1
+    hostname: kafka1
+
+    depends_on:
+      - kafka-permissions
+
+    ports:
+      - "9092:9092"
+      - "19092:19092"
+
+    volumes:
+      - ./data/kafka1:/var/lib/kafka/data
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-init
+    depends_on:
+      - kafka1
+    command: >
+      bash -c "
+        set -e
+
+        echo 'Waiting for Kafka...'
+
+        until kafka-topics --bootstrap-server kafka1:9092 --list >/dev/null 2>&1; do
+          sleep 2
+        done
+
+        echo 'Kafka ready, waiting controller...'
+        sleep 10
+
+        echo 'Creating topic...'
+
+        kafka-topics --bootstrap-server kafka1:9092 --create --if-not-exists --topic metric-sherlock --partitions 3 --replication-factor 1
+
+        echo 'Done'
+      "
+    restart: "no"
+
+  kafbat-ui:
+    image: ghcr.io/kafbat/kafka-ui:latest
+    container_name: kafbat-ui
+    restart: unless-stopped
+    depends_on:
+      - kafka1
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092
+
+  keycloak-postgres:
+    image: postgres:18-alpine
+    container_name: keycloak-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - ./data/keycloak-postgres:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak -d keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.6
+    container_name: keycloak
+    restart: unless-stopped
+    command: start-dev
+    environment:
+      KC_DB: postgres # db type
+      KC_DB_URL_HOST: keycloak-postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+
+  etcd1:
+    <<: *etcd-common
+    container_name: etcd1
+    environment:
+      ETCD_NAME: etcd1
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:2379
+
+  metric-sherlock:
+    image: git.server.lan/maksim/metric-sherlock-diploma:latest
+    volumes:
+      - ./values:/app/values
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - metric-sherlock

@@ -26,12 +26,14 @@ const (
 	OutboxBatchSize configKey = "values.outbox_batch_size"
 	// OutboxMaxRetries Max retries before marking outbox row as failed
 	OutboxMaxRetries configKey = "values.outbox_max_retries"
-	// JWTIssuer Expected token issuer (iss)
-	JWTIssuer configKey = "values.jwt_issuer"
-	// JWTJWKSEndpoint JWKS endpoint for token signature verification
-	JWTJWKSEndpoint configKey = "values.jwt_jwks_endpoint"
-	// JWTExpectedAZP Expected token azp value
-	JWTExpectedAZP configKey = "values.jwt_expected_azp"
+	// JwtIssuerInternal Expected JWT issuer (iss) for requests from app, e.g. http://keycloak:8080/realms/local
+	JwtIssuerInternal configKey = "values.jwt_issuer_internal"
+	// JwtIssuerPublic Expected JWT issuer (iss) for e.g. swagger, e.g. http://localhost:8080/realms/local
+	JwtIssuerPublic configKey = "values.jwt_issuer_public"
+	// JwtJwksEndpoint Optional JWKS endpoint override; empty means issuer + /protocol/openid-connect/certs
+	JwtJwksEndpoint configKey = "values.jwt_jwks_endpoint"
+	// JwtExpectedAzp Optional expected azp value (client id)
+	JwtExpectedAzp configKey = "values.jwt_expected_azp"
 	// ProduceTasksCronExpr Task producer cron schedule
 	ProduceTasksCronExpr realtimeConfigKey = "realtime_config.produce_tasks_cron_expr"
 	// LimitsConfig Setups limits configs

@@ -27,5 +27,5 @@ jobs:
 
       - name: build and push
         run: |
-          docker build --network host -t $IMAGE:latest .
+          docker build --network host -f ./deploy/Dockerfile -t $IMAGE:latest .
           docker push $IMAGE:latest

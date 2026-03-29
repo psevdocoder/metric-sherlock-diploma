@@ -33,3 +33,8 @@ values/*
 
 .local/*
 !.local/docker-compose.yml
+
+.deploy/*
+!.deploy/docker-compose.yml
+!.deploy/Dockerfile
+!.deploy/nginx.conf
