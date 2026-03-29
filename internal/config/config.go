@@ -26,6 +26,12 @@ const (
 	OutboxBatchSize configKey = "values.outbox_batch_size"
 	// OutboxMaxRetries Max retries before marking outbox row as failed
 	OutboxMaxRetries configKey = "values.outbox_max_retries"
+	// JWTIssuer Expected token issuer (iss)
+	JWTIssuer configKey = "values.jwt_issuer"
+	// JWTJWKSEndpoint JWKS endpoint for token signature verification
+	JWTJWKSEndpoint configKey = "values.jwt_jwks_endpoint"
+	// JWTExpectedAZP Expected token azp value
+	JWTExpectedAZP configKey = "values.jwt_expected_azp"
 	// ProduceTasksCronExpr Task producer cron schedule
 	ProduceTasksCronExpr realtimeConfigKey = "realtime_config.produce_tasks_cron_expr"
 	// LimitsConfig Setups limits configs

@@ -2,13 +2,19 @@ package httpapi
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
+	"git.server.lan/maksim/metric-sherlock-diploma/pkg/jwtclaims"
 	targetgroupsv1 "git.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/targetgroups/v1"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
 
-func NewHandler(storage targetGroupStorage) (http.Handler, error) {
+func NewHandler(storage targetGroupStorage, verifier jwtclaims.Verifier) (http.Handler, error) {
+	if verifier == nil {
+		return nil, errors.New("jwt verifier is nil")
+	}
+
 	service := newTargetGroupsService(storage)
 	gwMux := runtime.NewServeMux()
 
@@ -17,7 +23,7 @@ func NewHandler(storage targetGroupStorage) (http.Handler, error) {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/", gwMux)
+	mux.Handle("/api/v1/", authMiddleware(verifier)(gwMux))
 	mux.HandleFunc("/swagger", swaggerRedirectHandler)
 	mux.HandleFunc("/swagger/", swaggerUIHandler)
 	mux.HandleFunc("/swagger/target-groups.json", swaggerJSONHandler)

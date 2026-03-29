@@ -26,6 +26,15 @@ values:
   - name: outbox_max_retries
     value: int
     usage: Max retries before marking outbox row as failed
+  - name: jwt_issuer
+    value: string
+    usage: Expected JWT issuer (iss), e.g. http://localhost:8080/realms/local
+  - name: jwt_jwks_endpoint
+    value: string
+    usage: Optional JWKS endpoint override; empty means issuer + /protocol/openid-connect/certs
+  - name: jwt_expected_azp
+    value: string
+    usage: Optional expected azp value (client id)
 
 secrets:
   - name: db_password

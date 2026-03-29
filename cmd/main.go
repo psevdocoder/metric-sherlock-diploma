@@ -18,6 +18,7 @@ import (
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/storage/postgres"
 	"git.server.lan/maksim/metric-sherlock-diploma/pkg/cron"
+	"git.server.lan/maksim/metric-sherlock-diploma/pkg/jwtclaims"
 	"git.server.lan/pkg/closer/v2"
 	"git.server.lan/pkg/config/realtimeconfig"
 	"git.server.lan/pkg/zaplogger/logger"
@@ -105,7 +106,28 @@ func main() {
 	portRaw, _ := config.GetValue(config.Port)
 	port, _ := portRaw.Int()
 
-	apiHandler, err := httpapi.NewHandler(pgStorage)
+	jwtIssuerRaw, _ := config.GetValue(config.JWTIssuer)
+	jwtIssuer, _ := jwtIssuerRaw.String()
+	if jwtIssuer == "" {
+		logger.Fatal("JWT issuer is empty")
+	}
+
+	jwtJWKSEndpointRaw, _ := config.GetValue(config.JWTJWKSEndpoint)
+	jwtJWKSEndpoint, _ := jwtJWKSEndpointRaw.String()
+
+	jwtExpectedAZPRaw, _ := config.GetValue(config.JWTExpectedAZP)
+	jwtExpectedAZP, _ := jwtExpectedAZPRaw.String()
+
+	jwtVerifier, err := jwtclaims.NewJWKSVerifier(jwtclaims.Config{
+		Issuer:       jwtIssuer,
+		JWKSEndpoint: jwtJWKSEndpoint,
+		ExpectedAZP:  jwtExpectedAZP,
+	})
+	if err != nil {
+		logger.Fatal("Failed to initialize JWT verifier", zap.Error(err))
+	}
+
+	apiHandler, err := httpapi.NewHandler(pgStorage, jwtVerifier)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP API handler", zap.Error(err))
 	}
