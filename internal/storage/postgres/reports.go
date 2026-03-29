@@ -3,11 +3,11 @@ package postgres
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	metricviolationsv1 "git.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/metricviolations/v1"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -98,14 +98,8 @@ func (s *Storage) buildViolationOutboxEvents(report *scraper.Report, createdAt t
 		}
 
 		events = append(events, outboxEvent{
-			Topic: s.outboxTopic,
-			Key: fmt.Sprintf(
-				"%s|%s|%s|%s",
-				report.TargetGroup,
-				report.Env,
-				report.Cluster,
-				check.Type,
-			),
+			Topic:     s.outboxTopic,
+			Key:       uuid.NewString(),
 			Body:      payload,
 			CreatedAt: createdAt,
 		})

@@ -8,6 +8,7 @@ require (
 	git.server.lan/pkg/leader-election-go v1.0.0
 	git.server.lan/pkg/zaplogger v1.0.4
 	github.com/cenkalti/backoff/v4 v4.3.0
+	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/prometheus/client_model v0.6.1
