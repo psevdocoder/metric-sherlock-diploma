@@ -17,6 +17,7 @@ const ssoSecuritySchemeName = "sso"
 
 func NewHandler(
 	storage targetGroupStorage,
+	settings runtimeSettings,
 	verifier jwtclaims.Verifier,
 	swaggerSSOIDP string,
 	swaggerOAuthClientID string,
@@ -34,7 +35,7 @@ func NewHandler(
 		return nil, err
 	}
 
-	service := newTargetGroupsService(storage)
+	service := newTargetGroupsService(storage, settings)
 	gwMux := runtime.NewServeMux()
 
 	if err := targetgroupsv1.RegisterTargetGroupsServiceHandlerServer(context.Background(), gwMux, service); err != nil {

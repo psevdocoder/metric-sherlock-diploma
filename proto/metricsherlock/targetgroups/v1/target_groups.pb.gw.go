@@ -359,6 +359,102 @@ func local_request_TargetGroupsService_DeleteTargetWhitelist_0(ctx context.Conte
 	return msg, metadata, err
 }
 
+func request_TargetGroupsService_GetMetricCheckLimits_0(ctx context.Context, marshaler runtime.Marshaler, client TargetGroupsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMetricCheckLimitsRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetMetricCheckLimits(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_TargetGroupsService_GetMetricCheckLimits_0(ctx context.Context, marshaler runtime.Marshaler, server TargetGroupsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMetricCheckLimitsRequest
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetMetricCheckLimits(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_TargetGroupsService_UpdateMetricCheckLimits_0(ctx context.Context, marshaler runtime.Marshaler, client TargetGroupsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateMetricCheckLimitsRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.UpdateMetricCheckLimits(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_TargetGroupsService_UpdateMetricCheckLimits_0(ctx context.Context, marshaler runtime.Marshaler, server TargetGroupsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateMetricCheckLimitsRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.UpdateMetricCheckLimits(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_TargetGroupsService_GetScrapeTasksSchedule_0(ctx context.Context, marshaler runtime.Marshaler, client TargetGroupsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetScrapeTasksScheduleRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetScrapeTasksSchedule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_TargetGroupsService_GetScrapeTasksSchedule_0(ctx context.Context, marshaler runtime.Marshaler, server TargetGroupsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetScrapeTasksScheduleRequest
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetScrapeTasksSchedule(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_TargetGroupsService_UpdateScrapeTasksSchedule_0(ctx context.Context, marshaler runtime.Marshaler, client TargetGroupsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateScrapeTasksScheduleRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.UpdateScrapeTasksSchedule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_TargetGroupsService_UpdateScrapeTasksSchedule_0(ctx context.Context, marshaler runtime.Marshaler, server TargetGroupsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateScrapeTasksScheduleRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.UpdateScrapeTasksSchedule(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterTargetGroupsServiceHandlerServer registers the http handlers for service TargetGroupsService to "mux".
 // UnaryRPC     :call TargetGroupsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -524,6 +620,86 @@ func RegisterTargetGroupsServiceHandlerServer(ctx context.Context, mux *runtime.
 			return
 		}
 		forward_TargetGroupsService_DeleteTargetWhitelist_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_TargetGroupsService_GetMetricCheckLimits_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/GetMetricCheckLimits", runtime.WithHTTPPathPattern("/api/v1/settings/metric-check-limits"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_TargetGroupsService_GetMetricCheckLimits_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_GetMetricCheckLimits_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPut, pattern_TargetGroupsService_UpdateMetricCheckLimits_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateMetricCheckLimits", runtime.WithHTTPPathPattern("/api/v1/settings/metric-check-limits"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_TargetGroupsService_UpdateMetricCheckLimits_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_UpdateMetricCheckLimits_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_TargetGroupsService_GetScrapeTasksSchedule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/GetScrapeTasksSchedule", runtime.WithHTTPPathPattern("/api/v1/settings/scrape-tasks-schedule"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_TargetGroupsService_GetScrapeTasksSchedule_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_GetScrapeTasksSchedule_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPut, pattern_TargetGroupsService_UpdateScrapeTasksSchedule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateScrapeTasksSchedule", runtime.WithHTTPPathPattern("/api/v1/settings/scrape-tasks-schedule"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_TargetGroupsService_UpdateScrapeTasksSchedule_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_UpdateScrapeTasksSchedule_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -701,27 +877,103 @@ func RegisterTargetGroupsServiceHandlerClient(ctx context.Context, mux *runtime.
 		}
 		forward_TargetGroupsService_DeleteTargetWhitelist_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_TargetGroupsService_GetMetricCheckLimits_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/GetMetricCheckLimits", runtime.WithHTTPPathPattern("/api/v1/settings/metric-check-limits"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_TargetGroupsService_GetMetricCheckLimits_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_GetMetricCheckLimits_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPut, pattern_TargetGroupsService_UpdateMetricCheckLimits_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateMetricCheckLimits", runtime.WithHTTPPathPattern("/api/v1/settings/metric-check-limits"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_TargetGroupsService_UpdateMetricCheckLimits_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_UpdateMetricCheckLimits_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_TargetGroupsService_GetScrapeTasksSchedule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/GetScrapeTasksSchedule", runtime.WithHTTPPathPattern("/api/v1/settings/scrape-tasks-schedule"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_TargetGroupsService_GetScrapeTasksSchedule_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_GetScrapeTasksSchedule_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPut, pattern_TargetGroupsService_UpdateScrapeTasksSchedule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateScrapeTasksSchedule", runtime.WithHTTPPathPattern("/api/v1/settings/scrape-tasks-schedule"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_TargetGroupsService_UpdateScrapeTasksSchedule_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_TargetGroupsService_UpdateScrapeTasksSchedule_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_TargetGroupsService_ListTargetGroups_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "target-groups"}, ""))
-	pattern_TargetGroupsService_GetTargetGroup_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "target-groups", "id"}, ""))
-	pattern_TargetGroupsService_ListMetricWhitelist_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "metrics"}, ""))
-	pattern_TargetGroupsService_UpsertMetricWhitelist_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "metrics"}, ""))
-	pattern_TargetGroupsService_DeleteMetricWhitelist_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "whitelist", "metrics", "target_group", "env", "metric_name"}, ""))
-	pattern_TargetGroupsService_ListTargetWhitelist_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "targets"}, ""))
-	pattern_TargetGroupsService_UpsertTargetWhitelist_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "targets"}, ""))
-	pattern_TargetGroupsService_DeleteTargetWhitelist_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "whitelist", "targets", "target_group", "env"}, ""))
+	pattern_TargetGroupsService_ListTargetGroups_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "target-groups"}, ""))
+	pattern_TargetGroupsService_GetTargetGroup_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "target-groups", "id"}, ""))
+	pattern_TargetGroupsService_ListMetricWhitelist_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "metrics"}, ""))
+	pattern_TargetGroupsService_UpsertMetricWhitelist_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "metrics"}, ""))
+	pattern_TargetGroupsService_DeleteMetricWhitelist_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "whitelist", "metrics", "target_group", "env", "metric_name"}, ""))
+	pattern_TargetGroupsService_ListTargetWhitelist_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "targets"}, ""))
+	pattern_TargetGroupsService_UpsertTargetWhitelist_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "whitelist", "targets"}, ""))
+	pattern_TargetGroupsService_DeleteTargetWhitelist_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "whitelist", "targets", "target_group", "env"}, ""))
+	pattern_TargetGroupsService_GetMetricCheckLimits_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "settings", "metric-check-limits"}, ""))
+	pattern_TargetGroupsService_UpdateMetricCheckLimits_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "settings", "metric-check-limits"}, ""))
+	pattern_TargetGroupsService_GetScrapeTasksSchedule_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "settings", "scrape-tasks-schedule"}, ""))
+	pattern_TargetGroupsService_UpdateScrapeTasksSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "settings", "scrape-tasks-schedule"}, ""))
 )
 
 var (
-	forward_TargetGroupsService_ListTargetGroups_0      = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_GetTargetGroup_0        = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_ListMetricWhitelist_0   = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_UpsertMetricWhitelist_0 = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_DeleteMetricWhitelist_0 = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_ListTargetWhitelist_0   = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_UpsertTargetWhitelist_0 = runtime.ForwardResponseMessage
-	forward_TargetGroupsService_DeleteTargetWhitelist_0 = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_ListTargetGroups_0          = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_GetTargetGroup_0            = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_ListMetricWhitelist_0       = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_UpsertMetricWhitelist_0     = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_DeleteMetricWhitelist_0     = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_ListTargetWhitelist_0       = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_UpsertTargetWhitelist_0     = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_DeleteTargetWhitelist_0     = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_GetMetricCheckLimits_0      = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_UpdateMetricCheckLimits_0   = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_GetScrapeTasksSchedule_0    = runtime.ForwardResponseMessage
+	forward_TargetGroupsService_UpdateScrapeTasksSchedule_0 = runtime.ForwardResponseMessage
 )

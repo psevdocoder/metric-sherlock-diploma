@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -14,8 +16,10 @@ import (
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/httpapi"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/leaderelection"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/outbox"
+	"git.server.lan/maksim/metric-sherlock-diploma/internal/runtimeconfig"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
+	"git.server.lan/maksim/metric-sherlock-diploma/internal/storage/etcdstorage"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/storage/postgres"
 	"git.server.lan/maksim/metric-sherlock-diploma/pkg/cron"
 	"git.server.lan/maksim/metric-sherlock-diploma/pkg/jwtclaims"
@@ -23,6 +27,8 @@ import (
 	"git.server.lan/pkg/config/realtimeconfig"
 	"git.server.lan/pkg/zaplogger/logger"
 	"git.server.lan/pkg/zaplogger/zaploggercore"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 	"github.com/segmentio/kafka-go"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
@@ -30,6 +36,7 @@ import (
 
 const (
 	gracefulShutdownTimeout = 10 * time.Second
+	scheduleSyncInterval    = 5 * time.Second
 	localEnv                = "local"
 )
 
@@ -52,6 +59,9 @@ func main() {
 
 	pgDsnRaw, _ := config.GetSecret(config.PgDsn)
 	pgDsn, _ := pgDsnRaw.String()
+	if err := runMigrations(ctx, pgDsn); err != nil {
+		logger.Fatal("Failed to apply database migrations", zap.Error(err))
+	}
 
 	kafkaBrokersRaw, _ := config.GetValue(config.KafkaBrokers)
 	kafkaBrokersStr, _ := kafkaBrokersRaw.String()
@@ -127,7 +137,94 @@ func main() {
 		logger.Fatal("Failed to initialize JWT verifier", zap.Error(err))
 	}
 
-	apiHandler, err := httpapi.NewHandler(pgStorage, jwtVerifier, jwtIssuer, jwtExpectedAZP)
+	cronManager := cron.NewCronManager()
+	closer.Add(func() error {
+		return cronManager.Stop(ctx)
+	})
+
+	limitsConfigRaw, _ := config.GetValue(config.LimitsConfig)
+	limitsConfigStr, _ := limitsConfigRaw.String()
+
+	var defaultLimitsConfig scraper.LimitsConfig
+	if err = json.Unmarshal([]byte(limitsConfigStr), &defaultLimitsConfig); err != nil {
+		logger.Fatal("Failed to parse default limits config", zap.Error(err))
+	}
+
+	produceTasksCronRaw, _ := config.GetValue(config.ProduceTasksCronExpr)
+	defaultProduceTasksCron, _ := produceTasksCronRaw.String()
+
+	sdConfigPathRaw, _ := config.GetValue(config.SdConfigPath)
+	sdConfigPath, _ := sdConfigPathRaw.String()
+
+	etcdEndpointsRaw, _ := config.GetValue(config.EtcdEndpoints)
+	etcdEndpointsStr, _ := etcdEndpointsRaw.String()
+	rawEtcdEndpoints := strings.Split(etcdEndpointsStr, ",")
+	etcdEndpoints := make([]string, 0, len(rawEtcdEndpoints))
+	for _, endpoint := range rawEtcdEndpoints {
+		endpoint = strings.TrimSpace(endpoint)
+		if endpoint == "" {
+			continue
+		}
+		etcdEndpoints = append(etcdEndpoints, endpoint)
+	}
+
+	if len(etcdEndpoints) == 0 {
+		logger.Fatal("Etcd endpoints list is empty")
+	}
+
+	settingsEtcdClient, err := clientv3.New(clientv3.Config{
+		Endpoints: etcdEndpoints,
+	})
+	if err != nil {
+		logger.Fatal("Failed to create etcd client for runtime settings", zap.Error(err))
+	}
+
+	statusCtx, statusCancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer statusCancel()
+	if _, err = settingsEtcdClient.Status(statusCtx, etcdEndpoints[0]); err != nil {
+		logger.Fatal(
+			"Failed to connect to etcd for runtime settings",
+			zap.Any("endpoints", etcdEndpoints),
+			zap.Error(err),
+		)
+	}
+
+	closer.Add(func() error {
+		return settingsEtcdClient.Close()
+	})
+
+	etcdSettingsStorage := etcdstorage.New(settingsEtcdClient, 3*time.Second)
+	runtimeSettingsService := runtimeconfig.New(etcdSettingsStorage, defaultLimitsConfig, defaultProduceTasksCron)
+	if err = runtimeSettingsService.Bootstrap(ctx); err != nil {
+		logger.Fatal("Failed to bootstrap runtime settings in etcd", zap.Error(err))
+	}
+
+	produceScrapeTasksJob := scrapetask.NewJob(pgStorage, sdConfigPath)
+	produceScrapeTasksScheduler := scrapetask.NewScheduler(cronManager, produceScrapeTasksJob, runtimeSettingsService)
+	runtimeSettingsService.SetCronScheduleApplier(produceScrapeTasksScheduler)
+
+	if err = produceScrapeTasksScheduler.Init(ctx); err != nil {
+		logger.Fatal("Failed to initialize scrape tasks scheduler", zap.Error(err))
+	}
+
+	scheduleSyncCtx, scheduleSyncCancel := context.WithCancel(context.Background())
+	closer.Add(func() error {
+		scheduleSyncCancel()
+		return nil
+	})
+	go produceScrapeTasksScheduler.RunSyncLoop(scheduleSyncCtx, scheduleSyncInterval)
+
+	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), defaultLimitsConfig, runtimeSettingsService, pgStorage)
+	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
+	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
+	go taskConsumer.Run(ctx)
+
+	closer.Add(func() error {
+		taskConsumer.Stop()
+		return nil
+	})
+
+	apiHandler, err := httpapi.NewHandler(pgStorage, runtimeSettingsService, jwtVerifier, jwtIssuer, jwtExpectedAZP)
 	if err != nil {
 		logger.Fatal("Failed to create HTTP API handler", zap.Error(err))
 	}
@@ -151,28 +248,7 @@ func main() {
 		return httpServer.Shutdown(shutdownCtx)
 	})
 
-	cronManager := cron.NewCronManager()
-	closer.Add(func() error {
-		return cronManager.Stop(ctx)
-	})
-
-	limitsConfigRaw, _ := config.GetValue(config.LimitsConfig)
-	limitsConfigStr, _ := limitsConfigRaw.String()
-
-	var limitsConfig scraper.LimitsConfig
-	if err := json.Unmarshal([]byte(limitsConfigStr), &limitsConfig); err != nil {
-		logger.Fatal("Failed to parse limits config", zap.Error(err))
-	}
-
-	taskProcessor := scraper.NewProcessor(scraper.NewMetricsClient(), limitsConfig, pgStorage)
-	taskConsumerPool := scraper.NewWorkerPool(ctx, taskProcessor, 5)
-	taskConsumer := scraper.NewTaskConsumer(pgStorage, pgStorage, pgStorage, taskConsumerPool, false)
-	go taskConsumer.Run(ctx)
-
-	closer.Add(func() error {
-		taskConsumer.Stop()
-		return nil
-	})
+	logger.Debug("Connected to etcd for runtime settings", zap.Any("endpoints", etcdEndpoints))
 
 	var elector leaderelection.LeaderElector
 	if env == localEnv {
@@ -245,22 +321,35 @@ func main() {
 		logger.Info("Stopped leadership")
 	})
 
-	sdConfigPathRaw, _ := config.GetValue(config.SdConfigPath)
-	sdConfigPath, _ := sdConfigPathRaw.String()
-
-	produceScrapeTasksJob := scrapetask.NewJob(pgStorage, sdConfigPath)
-	produceTasksCronRaw, _ := config.GetValue(config.ProduceTasksCronExpr)
-	produceTasksCron, _ := produceTasksCronRaw.String()
-
-	err = errors.Join(
-		cronManager.AddTask(ctx, produceTasksCron, produceScrapeTasksJob),
-	)
-	if err != nil {
-		logger.Fatal("Failed to start cron manager", zap.Error(err))
-	}
-
 	logger.Warn("Application started")
 
 	closer.Wait()
 	logger.Warn("Application stopped")
+}
+
+func runMigrations(ctx context.Context, dsn string) error {
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		return fmt.Errorf("open database for migrations: %w", err)
+	}
+	defer func() {
+		if closeErr := db.Close(); closeErr != nil {
+			logger.Error("Failed to close migrations DB connection", zap.Error(closeErr))
+		}
+	}()
+
+	if err = db.PingContext(ctx); err != nil {
+		return fmt.Errorf("ping database for migrations: %w", err)
+	}
+
+	if err = goose.SetDialect("postgres"); err != nil {
+		return fmt.Errorf("set goose dialect: %w", err)
+	}
+
+	migrationsDir := filepath.Join("migrations", "postgres")
+	if err = goose.UpContext(ctx, db, migrationsDir); err != nil {
+		return fmt.Errorf("apply goose up migrations from %q: %w", migrationsDir, err)
+	}
+
+	return nil
 }

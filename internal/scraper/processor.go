@@ -12,14 +12,25 @@ import (
 
 type Processor struct {
 	client            *MetricsClient
-	limits            LimitsConfig
+	defaultLimits     LimitsConfig
+	limitsProvider    LimitsProvider
 	whitelistProvider WhitelistProvider
 }
 
-func NewProcessor(client *MetricsClient, limitsConfig LimitsConfig, whitelistProvider WhitelistProvider) *Processor {
+type LimitsProvider interface {
+	GetMetricLimits(ctx context.Context) (LimitsConfig, error)
+}
+
+func NewProcessor(
+	client *MetricsClient,
+	defaultLimits LimitsConfig,
+	limitsProvider LimitsProvider,
+	whitelistProvider WhitelistProvider,
+) *Processor {
 	return &Processor{
 		client:            client,
-		limits:            limitsConfig,
+		defaultLimits:     defaultLimits,
+		limitsProvider:    limitsProvider,
 		whitelistProvider: whitelistProvider,
 	}
 }
@@ -39,6 +50,17 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 	}
 
 	whitelists := NewEffectiveWhitelists()
+	limits := p.defaultLimits
+
+	if p.limitsProvider != nil {
+		loadedLimits, err := p.limitsProvider.GetMetricLimits(ctx)
+		if err != nil {
+			logger.Error("Failed to load metric limits config from provider", zap.Error(err))
+		} else {
+			limits = loadedLimits
+		}
+	}
+
 	if p.whitelistProvider != nil {
 		loadedWhitelists, err := p.whitelistProvider.GetEffectiveWhitelists(ctx, task.TargetGroup, task.Env)
 		if err != nil {
@@ -63,7 +85,7 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 		}
 
 		for _, metric := range metrics {
-			p.handleMetricFamily(statistic, metric, whitelists)
+			p.handleMetricFamily(statistic, metric, limits, whitelists)
 		}
 		totalProcessed++
 
@@ -72,7 +94,7 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 				statistic.maxResponseWeight = bytesWeight
 			}
 
-			if p.limits.MaxBytesWeight < bytesWeight && statistic.Details.ResponseWeight < bytesWeight {
+			if limits.MaxBytesWeight < bytesWeight && statistic.Details.ResponseWeight < bytesWeight {
 				statistic.Details.ResponseWeight = bytesWeight
 			}
 		}
@@ -90,7 +112,7 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 		TeamName: task.TeamName,
 	}
 
-	checks := buildCheckResults(statistic, p.limits, whitelists)
+	checks := buildCheckResults(statistic, limits, whitelists)
 	statistic.Checks = checks
 	statistic.Details.Checks = checks
 	statistic.Details.Limits = buildCheckLimits(checks)
@@ -99,7 +121,12 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 	return statistic, []*TargetGroup{tg}, nil
 }
 
-func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whitelists *EffectiveWhitelists) {
+func (p *Processor) handleMetricFamily(
+	stats *Report,
+	mf *dto.MetricFamily,
+	limits LimitsConfig,
+	whitelists *EffectiveWhitelists,
+) {
 	if mf == nil {
 		return
 	}
@@ -112,7 +139,7 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whit
 			stats.maxMetricNameLen = l
 		}
 
-		if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeMetricNameLength, int64(p.limits.MaxMetricNameLen), int64(len(metricName)), whitelists); violated {
+		if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeMetricNameLength, int64(limits.MaxMetricNameLen), int64(len(metricName)), whitelists); violated {
 			d.addMetricNameViolation(MetricNameViolation{
 				MetricName:  metricName,
 				Length:      len(metricName),
@@ -126,7 +153,7 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whit
 			stats.maxMetricCardinality = cardinality
 		}
 
-		if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeCardinality, int64(p.limits.MaxMetricCardinality), int64(len(mf.Metric)), whitelists); violated {
+		if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeCardinality, int64(limits.MaxMetricCardinality), int64(len(mf.Metric)), whitelists); violated {
 			d.addCardinalityViolation(CardinalityViolation{
 				MetricName:  metricName,
 				Value:       len(mf.Metric),
@@ -153,7 +180,7 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whit
 					stats.maxLabelNameLen = l
 				}
 
-				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeLabelNameLength, int64(p.limits.MaxLabelNameLen), int64(len(labelName)), whitelists); violated {
+				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeLabelNameLength, int64(limits.MaxLabelNameLen), int64(len(labelName)), whitelists); violated {
 					d.addLabelNameViolation(LabelNameViolation{
 						MetricName:  metricName,
 						LabelName:   labelName,
@@ -168,7 +195,7 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whit
 					stats.maxLabelValueLen = l
 				}
 
-				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeLabelValueLength, int64(p.limits.MaxLabelValueLen), int64(len(labelValue)), whitelists); violated {
+				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeLabelValueLength, int64(limits.MaxLabelValueLen), int64(len(labelValue)), whitelists); violated {
 					d.addLabelValueViolation(LabelValueViolation{
 						MetricName:  metricName,
 						LabelName:   labelName,
@@ -186,7 +213,7 @@ func (p *Processor) handleMetricFamily(stats *Report, mf *dto.MetricFamily, whit
 					stats.maxHistogramBuckets = buckets
 				}
 
-				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeHistogramBuckets, int64(p.limits.MaxHistogramBuckets), int64(len(h.Bucket)), whitelists); violated {
+				if _, whitelisted, violated := p.metricCheckLimit(metricName, CheckTypeHistogramBuckets, int64(limits.MaxHistogramBuckets), int64(len(h.Bucket)), whitelists); violated {
 					d.addHistogramBucketsViolation(HistogramBucketsViolation{
 						MetricName:  metricName,
 						Buckets:     len(h.Bucket),

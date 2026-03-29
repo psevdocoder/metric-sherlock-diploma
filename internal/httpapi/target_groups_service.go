@@ -3,8 +3,10 @@ package httpapi
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
+	"git.server.lan/maksim/metric-sherlock-diploma/internal/runtimeconfig"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/storage/postgres"
 	targetgroupsv1 "git.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/targetgroups/v1"
@@ -26,13 +28,24 @@ type targetGroupStorage interface {
 	DeleteTargetWhitelist(ctx context.Context, targetGroup, env string) error
 }
 
-type targetGroupsService struct {
-	targetgroupsv1.UnimplementedTargetGroupsServiceServer
-	storage targetGroupStorage
+type runtimeSettings interface {
+	GetMetricLimits(ctx context.Context) (scraper.LimitsConfig, error)
+	SetMetricLimits(ctx context.Context, limits scraper.LimitsConfig) error
+	GetProduceTasksCronExpr(ctx context.Context) (string, error)
+	SetProduceTasksCronExpr(ctx context.Context, cronExpr string) error
 }
 
-func newTargetGroupsService(storage targetGroupStorage) *targetGroupsService {
-	return &targetGroupsService{storage: storage}
+type targetGroupsService struct {
+	targetgroupsv1.UnimplementedTargetGroupsServiceServer
+	storage  targetGroupStorage
+	settings runtimeSettings
+}
+
+func newTargetGroupsService(storage targetGroupStorage, settings runtimeSettings) *targetGroupsService {
+	return &targetGroupsService{
+		storage:  storage,
+		settings: settings,
+	}
 }
 
 func (s *targetGroupsService) ListTargetGroups(
@@ -213,6 +226,83 @@ func (s *targetGroupsService) DeleteTargetWhitelist(
 
 	if err := s.storage.DeleteTargetWhitelist(ctx, req.GetTargetGroup(), req.GetEnv()); err != nil {
 		return nil, status.Error(codes.Internal, "failed to delete target whitelist")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *targetGroupsService) GetMetricCheckLimits(
+	ctx context.Context,
+	_ *targetgroupsv1.GetMetricCheckLimitsRequest,
+) (*targetgroupsv1.GetMetricCheckLimitsResponse, error) {
+	if s.settings == nil {
+		return nil, status.Error(codes.FailedPrecondition, "runtime settings service is not configured")
+	}
+
+	limits, err := s.settings.GetMetricLimits(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to load metric check limits config")
+	}
+
+	return &targetgroupsv1.GetMetricCheckLimitsResponse{
+		Limits: toProtoMetricCheckLimits(limits),
+	}, nil
+}
+
+func (s *targetGroupsService) UpdateMetricCheckLimits(
+	ctx context.Context,
+	req *targetgroupsv1.UpdateMetricCheckLimitsRequest,
+) (*emptypb.Empty, error) {
+	if s.settings == nil {
+		return nil, status.Error(codes.FailedPrecondition, "runtime settings service is not configured")
+	}
+
+	limits, err := fromProtoMetricCheckLimits(req.GetLimits())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid limits payload: %v", err)
+	}
+
+	if err = s.settings.SetMetricLimits(ctx, limits); err != nil {
+		if errors.Is(err, runtimeconfig.ErrInvalidLimitsConfig) {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid limits payload: %v", err)
+		}
+		return nil, status.Error(codes.Internal, "failed to save metric check limits config")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *targetGroupsService) GetScrapeTasksSchedule(
+	ctx context.Context,
+	_ *targetgroupsv1.GetScrapeTasksScheduleRequest,
+) (*targetgroupsv1.GetScrapeTasksScheduleResponse, error) {
+	if s.settings == nil {
+		return nil, status.Error(codes.FailedPrecondition, "runtime settings service is not configured")
+	}
+
+	cronExpr, err := s.settings.GetProduceTasksCronExpr(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to load scrape tasks schedule")
+	}
+
+	return &targetgroupsv1.GetScrapeTasksScheduleResponse{
+		CronExpr: cronExpr,
+	}, nil
+}
+
+func (s *targetGroupsService) UpdateScrapeTasksSchedule(
+	ctx context.Context,
+	req *targetgroupsv1.UpdateScrapeTasksScheduleRequest,
+) (*emptypb.Empty, error) {
+	if s.settings == nil {
+		return nil, status.Error(codes.FailedPrecondition, "runtime settings service is not configured")
+	}
+
+	if err := s.settings.SetProduceTasksCronExpr(ctx, req.GetCronExpr()); err != nil {
+		if errors.Is(err, runtimeconfig.ErrInvalidCronExpr) {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid cron expression: %v", err)
+		}
+		return nil, status.Error(codes.Internal, "failed to save scrape tasks schedule")
 	}
 
 	return &emptypb.Empty{}, nil
@@ -528,4 +618,67 @@ func fromTargetWhitelistChecks(checks *targetgroupsv1.TargetWhitelistChecks) []s
 		resp = append(resp, scraper.CheckTypeResponseWeight)
 	}
 	return resp
+}
+
+func toProtoMetricCheckLimits(limits scraper.LimitsConfig) *targetgroupsv1.MetricCheckLimits {
+	return &targetgroupsv1.MetricCheckLimits{
+		MaxMetricNameLen:     int64(limits.MaxMetricNameLen),
+		MaxLabelNameLen:      int64(limits.MaxLabelNameLen),
+		MaxLabelValueLen:     int64(limits.MaxLabelValueLen),
+		MaxMetricCardinality: int64(limits.MaxMetricCardinality),
+		MaxHistogramBuckets:  int64(limits.MaxHistogramBuckets),
+		MaxBytesWeight:       limits.MaxBytesWeight,
+	}
+}
+
+func fromProtoMetricCheckLimits(protoLimits *targetgroupsv1.MetricCheckLimits) (scraper.LimitsConfig, error) {
+	if protoLimits == nil {
+		return scraper.LimitsConfig{}, errors.New("limits are required")
+	}
+
+	maxMetricNameLen, err := int64ToPositiveInt(protoLimits.GetMaxMetricNameLen(), "max_metric_name_len")
+	if err != nil {
+		return scraper.LimitsConfig{}, err
+	}
+	maxLabelNameLen, err := int64ToPositiveInt(protoLimits.GetMaxLabelNameLen(), "max_label_name_len")
+	if err != nil {
+		return scraper.LimitsConfig{}, err
+	}
+	maxLabelValueLen, err := int64ToPositiveInt(protoLimits.GetMaxLabelValueLen(), "max_label_value_len")
+	if err != nil {
+		return scraper.LimitsConfig{}, err
+	}
+	maxMetricCardinality, err := int64ToPositiveInt(protoLimits.GetMaxMetricCardinality(), "max_metric_cardinality")
+	if err != nil {
+		return scraper.LimitsConfig{}, err
+	}
+	maxHistogramBuckets, err := int64ToPositiveInt(protoLimits.GetMaxHistogramBuckets(), "max_histogram_buckets")
+	if err != nil {
+		return scraper.LimitsConfig{}, err
+	}
+	maxBytesWeight := protoLimits.GetMaxBytesWeight()
+	if maxBytesWeight <= 0 {
+		return scraper.LimitsConfig{}, errors.New("max_bytes_weight must be positive")
+	}
+
+	return scraper.LimitsConfig{
+		MaxMetricNameLen:     maxMetricNameLen,
+		MaxLabelNameLen:      maxLabelNameLen,
+		MaxLabelValueLen:     maxLabelValueLen,
+		MaxMetricCardinality: maxMetricCardinality,
+		MaxHistogramBuckets:  maxHistogramBuckets,
+		MaxBytesWeight:       maxBytesWeight,
+	}, nil
+}
+
+func int64ToPositiveInt(value int64, field string) (int, error) {
+	maxInt := int64(^uint(0) >> 1)
+	if value <= 0 {
+		return 0, fmt.Errorf("%s must be positive", field)
+	}
+	if value > maxInt {
+		return 0, fmt.Errorf("%s exceeds max int value", field)
+	}
+
+	return int(value), nil
 }

@@ -880,6 +880,338 @@ func (x *TargetWhitelistChecks) GetResponseWeight() bool {
 	return false
 }
 
+type GetMetricCheckLimitsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMetricCheckLimitsRequest) Reset() {
+	*x = GetMetricCheckLimitsRequest{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMetricCheckLimitsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMetricCheckLimitsRequest) ProtoMessage() {}
+
+func (x *GetMetricCheckLimitsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMetricCheckLimitsRequest.ProtoReflect.Descriptor instead.
+func (*GetMetricCheckLimitsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{16}
+}
+
+type GetMetricCheckLimitsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limits        *MetricCheckLimits     `protobuf:"bytes,1,opt,name=limits,proto3" json:"limits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMetricCheckLimitsResponse) Reset() {
+	*x = GetMetricCheckLimitsResponse{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMetricCheckLimitsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMetricCheckLimitsResponse) ProtoMessage() {}
+
+func (x *GetMetricCheckLimitsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMetricCheckLimitsResponse.ProtoReflect.Descriptor instead.
+func (*GetMetricCheckLimitsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetMetricCheckLimitsResponse) GetLimits() *MetricCheckLimits {
+	if x != nil {
+		return x.Limits
+	}
+	return nil
+}
+
+type UpdateMetricCheckLimitsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limits        *MetricCheckLimits     `protobuf:"bytes,1,opt,name=limits,proto3" json:"limits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateMetricCheckLimitsRequest) Reset() {
+	*x = UpdateMetricCheckLimitsRequest{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateMetricCheckLimitsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateMetricCheckLimitsRequest) ProtoMessage() {}
+
+func (x *UpdateMetricCheckLimitsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateMetricCheckLimitsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateMetricCheckLimitsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *UpdateMetricCheckLimitsRequest) GetLimits() *MetricCheckLimits {
+	if x != nil {
+		return x.Limits
+	}
+	return nil
+}
+
+type MetricCheckLimits struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	MaxMetricNameLen     int64                  `protobuf:"varint,1,opt,name=max_metric_name_len,json=maxMetricNameLen,proto3" json:"max_metric_name_len,omitempty"`
+	MaxLabelNameLen      int64                  `protobuf:"varint,2,opt,name=max_label_name_len,json=maxLabelNameLen,proto3" json:"max_label_name_len,omitempty"`
+	MaxLabelValueLen     int64                  `protobuf:"varint,3,opt,name=max_label_value_len,json=maxLabelValueLen,proto3" json:"max_label_value_len,omitempty"`
+	MaxMetricCardinality int64                  `protobuf:"varint,4,opt,name=max_metric_cardinality,json=maxMetricCardinality,proto3" json:"max_metric_cardinality,omitempty"`
+	MaxHistogramBuckets  int64                  `protobuf:"varint,5,opt,name=max_histogram_buckets,json=maxHistogramBuckets,proto3" json:"max_histogram_buckets,omitempty"`
+	MaxBytesWeight       int64                  `protobuf:"varint,6,opt,name=max_bytes_weight,json=maxBytesWeight,proto3" json:"max_bytes_weight,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *MetricCheckLimits) Reset() {
+	*x = MetricCheckLimits{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MetricCheckLimits) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetricCheckLimits) ProtoMessage() {}
+
+func (x *MetricCheckLimits) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetricCheckLimits.ProtoReflect.Descriptor instead.
+func (*MetricCheckLimits) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *MetricCheckLimits) GetMaxMetricNameLen() int64 {
+	if x != nil {
+		return x.MaxMetricNameLen
+	}
+	return 0
+}
+
+func (x *MetricCheckLimits) GetMaxLabelNameLen() int64 {
+	if x != nil {
+		return x.MaxLabelNameLen
+	}
+	return 0
+}
+
+func (x *MetricCheckLimits) GetMaxLabelValueLen() int64 {
+	if x != nil {
+		return x.MaxLabelValueLen
+	}
+	return 0
+}
+
+func (x *MetricCheckLimits) GetMaxMetricCardinality() int64 {
+	if x != nil {
+		return x.MaxMetricCardinality
+	}
+	return 0
+}
+
+func (x *MetricCheckLimits) GetMaxHistogramBuckets() int64 {
+	if x != nil {
+		return x.MaxHistogramBuckets
+	}
+	return 0
+}
+
+func (x *MetricCheckLimits) GetMaxBytesWeight() int64 {
+	if x != nil {
+		return x.MaxBytesWeight
+	}
+	return 0
+}
+
+type GetScrapeTasksScheduleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetScrapeTasksScheduleRequest) Reset() {
+	*x = GetScrapeTasksScheduleRequest{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetScrapeTasksScheduleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScrapeTasksScheduleRequest) ProtoMessage() {}
+
+func (x *GetScrapeTasksScheduleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScrapeTasksScheduleRequest.ProtoReflect.Descriptor instead.
+func (*GetScrapeTasksScheduleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{20}
+}
+
+type GetScrapeTasksScheduleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CronExpr      string                 `protobuf:"bytes,1,opt,name=cron_expr,json=cronExpr,proto3" json:"cron_expr,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetScrapeTasksScheduleResponse) Reset() {
+	*x = GetScrapeTasksScheduleResponse{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetScrapeTasksScheduleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetScrapeTasksScheduleResponse) ProtoMessage() {}
+
+func (x *GetScrapeTasksScheduleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetScrapeTasksScheduleResponse.ProtoReflect.Descriptor instead.
+func (*GetScrapeTasksScheduleResponse) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetScrapeTasksScheduleResponse) GetCronExpr() string {
+	if x != nil {
+		return x.CronExpr
+	}
+	return ""
+}
+
+type UpdateScrapeTasksScheduleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CronExpr      string                 `protobuf:"bytes,1,opt,name=cron_expr,json=cronExpr,proto3" json:"cron_expr,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateScrapeTasksScheduleRequest) Reset() {
+	*x = UpdateScrapeTasksScheduleRequest{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateScrapeTasksScheduleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateScrapeTasksScheduleRequest) ProtoMessage() {}
+
+func (x *UpdateScrapeTasksScheduleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateScrapeTasksScheduleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateScrapeTasksScheduleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UpdateScrapeTasksScheduleRequest) GetCronExpr() string {
+	if x != nil {
+		return x.CronExpr
+	}
+	return ""
+}
+
 type TargetGroupDetails struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Summary         *TargetGroupSummary    `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
@@ -891,7 +1223,7 @@ type TargetGroupDetails struct {
 
 func (x *TargetGroupDetails) Reset() {
 	*x = TargetGroupDetails{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[16]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -903,7 +1235,7 @@ func (x *TargetGroupDetails) String() string {
 func (*TargetGroupDetails) ProtoMessage() {}
 
 func (x *TargetGroupDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[16]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -916,7 +1248,7 @@ func (x *TargetGroupDetails) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TargetGroupDetails.ProtoReflect.Descriptor instead.
 func (*TargetGroupDetails) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{16}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TargetGroupDetails) GetSummary() *TargetGroupSummary {
@@ -957,7 +1289,7 @@ type TargetGroupSummary struct {
 
 func (x *TargetGroupSummary) Reset() {
 	*x = TargetGroupSummary{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[17]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -969,7 +1301,7 @@ func (x *TargetGroupSummary) String() string {
 func (*TargetGroupSummary) ProtoMessage() {}
 
 func (x *TargetGroupSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[17]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -982,7 +1314,7 @@ func (x *TargetGroupSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TargetGroupSummary.ProtoReflect.Descriptor instead.
 func (*TargetGroupSummary) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{17}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *TargetGroupSummary) GetId() int64 {
@@ -1063,7 +1395,7 @@ type ViolationStats struct {
 
 func (x *ViolationStats) Reset() {
 	*x = ViolationStats{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[18]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1075,7 +1407,7 @@ func (x *ViolationStats) String() string {
 func (*ViolationStats) ProtoMessage() {}
 
 func (x *ViolationStats) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[18]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1088,7 +1420,7 @@ func (x *ViolationStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ViolationStats.ProtoReflect.Descriptor instead.
 func (*ViolationStats) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{18}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ViolationStats) GetTotal() int32 {
@@ -1156,7 +1488,7 @@ type ViolationDetails struct {
 
 func (x *ViolationDetails) Reset() {
 	*x = ViolationDetails{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[19]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1168,7 +1500,7 @@ func (x *ViolationDetails) String() string {
 func (*ViolationDetails) ProtoMessage() {}
 
 func (x *ViolationDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[19]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1181,7 +1513,7 @@ func (x *ViolationDetails) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ViolationDetails.ProtoReflect.Descriptor instead.
 func (*ViolationDetails) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{19}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ViolationDetails) GetMetricNameTooLong() []*MetricNameViolation {
@@ -1254,7 +1586,7 @@ type CheckMetrics struct {
 
 func (x *CheckMetrics) Reset() {
 	*x = CheckMetrics{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[20]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1266,7 +1598,7 @@ func (x *CheckMetrics) String() string {
 func (*CheckMetrics) ProtoMessage() {}
 
 func (x *CheckMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[20]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1279,7 +1611,7 @@ func (x *CheckMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckMetrics.ProtoReflect.Descriptor instead.
 func (*CheckMetrics) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{20}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *CheckMetrics) GetMetricNameLength() *CheckMetric {
@@ -1334,7 +1666,7 @@ type CheckMetric struct {
 
 func (x *CheckMetric) Reset() {
 	*x = CheckMetric{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[21]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1346,7 +1678,7 @@ func (x *CheckMetric) String() string {
 func (*CheckMetric) ProtoMessage() {}
 
 func (x *CheckMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[21]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1359,7 +1691,7 @@ func (x *CheckMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckMetric.ProtoReflect.Descriptor instead.
 func (*CheckMetric) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{21}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CheckMetric) GetLimit() int64 {
@@ -1389,7 +1721,7 @@ type MaxViolationStats struct {
 
 func (x *MaxViolationStats) Reset() {
 	*x = MaxViolationStats{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[22]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1401,7 +1733,7 @@ func (x *MaxViolationStats) String() string {
 func (*MaxViolationStats) ProtoMessage() {}
 
 func (x *MaxViolationStats) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[22]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1414,7 +1746,7 @@ func (x *MaxViolationStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MaxViolationStats.ProtoReflect.Descriptor instead.
 func (*MaxViolationStats) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{22}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *MaxViolationStats) GetMetricNameTooLong() *MetricNameViolation {
@@ -1462,7 +1794,7 @@ type MetricNameViolation struct {
 
 func (x *MetricNameViolation) Reset() {
 	*x = MetricNameViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[23]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1474,7 +1806,7 @@ func (x *MetricNameViolation) String() string {
 func (*MetricNameViolation) ProtoMessage() {}
 
 func (x *MetricNameViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[23]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +1819,7 @@ func (x *MetricNameViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricNameViolation.ProtoReflect.Descriptor instead.
 func (*MetricNameViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{23}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *MetricNameViolation) GetMetricName() string {
@@ -1515,7 +1847,7 @@ type LabelNameViolation struct {
 
 func (x *LabelNameViolation) Reset() {
 	*x = LabelNameViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[24]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1527,7 +1859,7 @@ func (x *LabelNameViolation) String() string {
 func (*LabelNameViolation) ProtoMessage() {}
 
 func (x *LabelNameViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[24]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1540,7 +1872,7 @@ func (x *LabelNameViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LabelNameViolation.ProtoReflect.Descriptor instead.
 func (*LabelNameViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{24}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *LabelNameViolation) GetMetricName() string {
@@ -1576,7 +1908,7 @@ type LabelValueViolation struct {
 
 func (x *LabelValueViolation) Reset() {
 	*x = LabelValueViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[25]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1588,7 +1920,7 @@ func (x *LabelValueViolation) String() string {
 func (*LabelValueViolation) ProtoMessage() {}
 
 func (x *LabelValueViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[25]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1601,7 +1933,7 @@ func (x *LabelValueViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LabelValueViolation.ProtoReflect.Descriptor instead.
 func (*LabelValueViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{25}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *LabelValueViolation) GetMetricName() string {
@@ -1642,7 +1974,7 @@ type CardinalityViolation struct {
 
 func (x *CardinalityViolation) Reset() {
 	*x = CardinalityViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[26]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1654,7 +1986,7 @@ func (x *CardinalityViolation) String() string {
 func (*CardinalityViolation) ProtoMessage() {}
 
 func (x *CardinalityViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[26]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1667,7 +1999,7 @@ func (x *CardinalityViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardinalityViolation.ProtoReflect.Descriptor instead.
 func (*CardinalityViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{26}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *CardinalityViolation) GetMetricName() string {
@@ -1694,7 +2026,7 @@ type HistogramBucketsViolation struct {
 
 func (x *HistogramBucketsViolation) Reset() {
 	*x = HistogramBucketsViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[27]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1706,7 +2038,7 @@ func (x *HistogramBucketsViolation) String() string {
 func (*HistogramBucketsViolation) ProtoMessage() {}
 
 func (x *HistogramBucketsViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[27]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1719,7 +2051,7 @@ func (x *HistogramBucketsViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistogramBucketsViolation.ProtoReflect.Descriptor instead.
 func (*HistogramBucketsViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{27}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *HistogramBucketsViolation) GetMetricName() string {
@@ -1793,7 +2125,24 @@ const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = ""
 	"\x12label_value_length\x18\x03 \x01(\bR\x10labelValueLength\x12 \n" +
 	"\vcardinality\x18\x04 \x01(\bR\vcardinality\x12+\n" +
 	"\x11histogram_buckets\x18\x05 \x01(\bR\x10histogramBuckets\x12'\n" +
-	"\x0fresponse_weight\x18\x06 \x01(\bR\x0eresponseWeight\"\xfc\x01\n" +
+	"\x0fresponse_weight\x18\x06 \x01(\bR\x0eresponseWeight\"\x1d\n" +
+	"\x1bGetMetricCheckLimitsRequest\"i\n" +
+	"\x1cGetMetricCheckLimitsResponse\x12I\n" +
+	"\x06limits\x18\x01 \x01(\v21.metricsherlock.targetgroups.v1.MetricCheckLimitsR\x06limits\"k\n" +
+	"\x1eUpdateMetricCheckLimitsRequest\x12I\n" +
+	"\x06limits\x18\x01 \x01(\v21.metricsherlock.targetgroups.v1.MetricCheckLimitsR\x06limits\"\xb2\x02\n" +
+	"\x11MetricCheckLimits\x12-\n" +
+	"\x13max_metric_name_len\x18\x01 \x01(\x03R\x10maxMetricNameLen\x12+\n" +
+	"\x12max_label_name_len\x18\x02 \x01(\x03R\x0fmaxLabelNameLen\x12-\n" +
+	"\x13max_label_value_len\x18\x03 \x01(\x03R\x10maxLabelValueLen\x124\n" +
+	"\x16max_metric_cardinality\x18\x04 \x01(\x03R\x14maxMetricCardinality\x122\n" +
+	"\x15max_histogram_buckets\x18\x05 \x01(\x03R\x13maxHistogramBuckets\x12(\n" +
+	"\x10max_bytes_weight\x18\x06 \x01(\x03R\x0emaxBytesWeight\"\x1f\n" +
+	"\x1dGetScrapeTasksScheduleRequest\"=\n" +
+	"\x1eGetScrapeTasksScheduleResponse\x12\x1b\n" +
+	"\tcron_expr\x18\x01 \x01(\tR\bcronExpr\"?\n" +
+	" UpdateScrapeTasksScheduleRequest\x12\x1b\n" +
+	"\tcron_expr\x18\x01 \x01(\tR\bcronExpr\"\xfc\x01\n" +
 	"\x12TargetGroupDetails\x12L\n" +
 	"\asummary\x18\x01 \x01(\v22.metricsherlock.targetgroups.v1.TargetGroupSummaryR\asummary\x12P\n" +
 	"\n" +
@@ -1869,8 +2218,7 @@ const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = ""
 	"\x19HistogramBucketsViolation\x12\x1f\n" +
 	"\vmetric_name\x18\x01 \x01(\tR\n" +
 	"metricName\x12\x18\n" +
-	"\abuckets\x18\x02 \x01(\x05R\abuckets2\xd4\n" +
-	"\n" +
+	"\abuckets\x18\x02 \x01(\x05R\abuckets2\xb0\x10\n" +
 	"\x13TargetGroupsService\x12\xa4\x01\n" +
 	"\x10ListTargetGroups\x127.metricsherlock.targetgroups.v1.ListTargetGroupsRequest\x1a8.metricsherlock.targetgroups.v1.ListTargetGroupsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/target-groups\x12\xa3\x01\n" +
 	"\x0eGetTargetGroup\x125.metricsherlock.targetgroups.v1.GetTargetGroupRequest\x1a6.metricsherlock.targetgroups.v1.GetTargetGroupResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/target-groups/{id}\x12\xb1\x01\n" +
@@ -1879,7 +2227,11 @@ const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = ""
 	"\x15DeleteMetricWhitelist\x12<.metricsherlock.targetgroups.v1.DeleteMetricWhitelistRequest\x1a\x16.google.protobuf.Empty\"D\x82\xd3\xe4\x93\x02>*</api/v1/whitelist/metrics/{target_group}/{env}/{metric_name}\x12\xb1\x01\n" +
 	"\x13ListTargetWhitelist\x12:.metricsherlock.targetgroups.v1.ListTargetWhitelistRequest\x1a;.metricsherlock.targetgroups.v1.ListTargetWhitelistResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/whitelist/targets\x12\x93\x01\n" +
 	"\x15UpsertTargetWhitelist\x12<.metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/whitelist/targets\x12\xa5\x01\n" +
-	"\x15DeleteTargetWhitelist\x12<.metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest\x1a\x16.google.protobuf.Empty\"6\x82\xd3\xe4\x93\x020*./api/v1/whitelist/targets/{target_group}/{env}BcZagit.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/targetgroups/v1;targetgroupsv1b\x06proto3"
+	"\x15DeleteTargetWhitelist\x12<.metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest\x1a\x16.google.protobuf.Empty\"6\x82\xd3\xe4\x93\x020*./api/v1/whitelist/targets/{target_group}/{env}\x12\xbf\x01\n" +
+	"\x14GetMetricCheckLimits\x12;.metricsherlock.targetgroups.v1.GetMetricCheckLimitsRequest\x1a<.metricsherlock.targetgroups.v1.GetMetricCheckLimitsResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/settings/metric-check-limits\x12\xa2\x01\n" +
+	"\x17UpdateMetricCheckLimits\x12>.metricsherlock.targetgroups.v1.UpdateMetricCheckLimitsRequest\x1a\x16.google.protobuf.Empty\"/\x82\xd3\xe4\x93\x02):\x01*\x1a$/api/v1/settings/metric-check-limits\x12\xc7\x01\n" +
+	"\x16GetScrapeTasksSchedule\x12=.metricsherlock.targetgroups.v1.GetScrapeTasksScheduleRequest\x1a>.metricsherlock.targetgroups.v1.GetScrapeTasksScheduleResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/settings/scrape-tasks-schedule\x12\xa8\x01\n" +
+	"\x19UpdateScrapeTasksSchedule\x12@.metricsherlock.targetgroups.v1.UpdateScrapeTasksScheduleRequest\x1a\x16.google.protobuf.Empty\"1\x82\xd3\xe4\x93\x02+:\x01*\x1a&/api/v1/settings/scrape-tasks-scheduleBcZagit.server.lan/maksim/metric-sherlock-diploma/proto/metricsherlock/targetgroups/v1;targetgroupsv1b\x06proto3"
 
 var (
 	file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescOnce sync.Once
@@ -1893,93 +2245,110 @@ func file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP()
 	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescData
 }
 
-var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_goTypes = []any{
-	(*ListTargetGroupsRequest)(nil),      // 0: metricsherlock.targetgroups.v1.ListTargetGroupsRequest
-	(*ListTargetGroupsResponse)(nil),     // 1: metricsherlock.targetgroups.v1.ListTargetGroupsResponse
-	(*GetTargetGroupRequest)(nil),        // 2: metricsherlock.targetgroups.v1.GetTargetGroupRequest
-	(*GetTargetGroupResponse)(nil),       // 3: metricsherlock.targetgroups.v1.GetTargetGroupResponse
-	(*ListMetricWhitelistRequest)(nil),   // 4: metricsherlock.targetgroups.v1.ListMetricWhitelistRequest
-	(*ListMetricWhitelistResponse)(nil),  // 5: metricsherlock.targetgroups.v1.ListMetricWhitelistResponse
-	(*UpsertMetricWhitelistRequest)(nil), // 6: metricsherlock.targetgroups.v1.UpsertMetricWhitelistRequest
-	(*DeleteMetricWhitelistRequest)(nil), // 7: metricsherlock.targetgroups.v1.DeleteMetricWhitelistRequest
-	(*MetricWhitelistItem)(nil),          // 8: metricsherlock.targetgroups.v1.MetricWhitelistItem
-	(*MetricWhitelistChecks)(nil),        // 9: metricsherlock.targetgroups.v1.MetricWhitelistChecks
-	(*ListTargetWhitelistRequest)(nil),   // 10: metricsherlock.targetgroups.v1.ListTargetWhitelistRequest
-	(*ListTargetWhitelistResponse)(nil),  // 11: metricsherlock.targetgroups.v1.ListTargetWhitelistResponse
-	(*UpsertTargetWhitelistRequest)(nil), // 12: metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest
-	(*DeleteTargetWhitelistRequest)(nil), // 13: metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest
-	(*TargetWhitelistItem)(nil),          // 14: metricsherlock.targetgroups.v1.TargetWhitelistItem
-	(*TargetWhitelistChecks)(nil),        // 15: metricsherlock.targetgroups.v1.TargetWhitelistChecks
-	(*TargetGroupDetails)(nil),           // 16: metricsherlock.targetgroups.v1.TargetGroupDetails
-	(*TargetGroupSummary)(nil),           // 17: metricsherlock.targetgroups.v1.TargetGroupSummary
-	(*ViolationStats)(nil),               // 18: metricsherlock.targetgroups.v1.ViolationStats
-	(*ViolationDetails)(nil),             // 19: metricsherlock.targetgroups.v1.ViolationDetails
-	(*CheckMetrics)(nil),                 // 20: metricsherlock.targetgroups.v1.CheckMetrics
-	(*CheckMetric)(nil),                  // 21: metricsherlock.targetgroups.v1.CheckMetric
-	(*MaxViolationStats)(nil),            // 22: metricsherlock.targetgroups.v1.MaxViolationStats
-	(*MetricNameViolation)(nil),          // 23: metricsherlock.targetgroups.v1.MetricNameViolation
-	(*LabelNameViolation)(nil),           // 24: metricsherlock.targetgroups.v1.LabelNameViolation
-	(*LabelValueViolation)(nil),          // 25: metricsherlock.targetgroups.v1.LabelValueViolation
-	(*CardinalityViolation)(nil),         // 26: metricsherlock.targetgroups.v1.CardinalityViolation
-	(*HistogramBucketsViolation)(nil),    // 27: metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	(*timestamppb.Timestamp)(nil),        // 28: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                // 29: google.protobuf.Empty
+	(*ListTargetGroupsRequest)(nil),          // 0: metricsherlock.targetgroups.v1.ListTargetGroupsRequest
+	(*ListTargetGroupsResponse)(nil),         // 1: metricsherlock.targetgroups.v1.ListTargetGroupsResponse
+	(*GetTargetGroupRequest)(nil),            // 2: metricsherlock.targetgroups.v1.GetTargetGroupRequest
+	(*GetTargetGroupResponse)(nil),           // 3: metricsherlock.targetgroups.v1.GetTargetGroupResponse
+	(*ListMetricWhitelistRequest)(nil),       // 4: metricsherlock.targetgroups.v1.ListMetricWhitelistRequest
+	(*ListMetricWhitelistResponse)(nil),      // 5: metricsherlock.targetgroups.v1.ListMetricWhitelistResponse
+	(*UpsertMetricWhitelistRequest)(nil),     // 6: metricsherlock.targetgroups.v1.UpsertMetricWhitelistRequest
+	(*DeleteMetricWhitelistRequest)(nil),     // 7: metricsherlock.targetgroups.v1.DeleteMetricWhitelistRequest
+	(*MetricWhitelistItem)(nil),              // 8: metricsherlock.targetgroups.v1.MetricWhitelistItem
+	(*MetricWhitelistChecks)(nil),            // 9: metricsherlock.targetgroups.v1.MetricWhitelistChecks
+	(*ListTargetWhitelistRequest)(nil),       // 10: metricsherlock.targetgroups.v1.ListTargetWhitelistRequest
+	(*ListTargetWhitelistResponse)(nil),      // 11: metricsherlock.targetgroups.v1.ListTargetWhitelistResponse
+	(*UpsertTargetWhitelistRequest)(nil),     // 12: metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest
+	(*DeleteTargetWhitelistRequest)(nil),     // 13: metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest
+	(*TargetWhitelistItem)(nil),              // 14: metricsherlock.targetgroups.v1.TargetWhitelistItem
+	(*TargetWhitelistChecks)(nil),            // 15: metricsherlock.targetgroups.v1.TargetWhitelistChecks
+	(*GetMetricCheckLimitsRequest)(nil),      // 16: metricsherlock.targetgroups.v1.GetMetricCheckLimitsRequest
+	(*GetMetricCheckLimitsResponse)(nil),     // 17: metricsherlock.targetgroups.v1.GetMetricCheckLimitsResponse
+	(*UpdateMetricCheckLimitsRequest)(nil),   // 18: metricsherlock.targetgroups.v1.UpdateMetricCheckLimitsRequest
+	(*MetricCheckLimits)(nil),                // 19: metricsherlock.targetgroups.v1.MetricCheckLimits
+	(*GetScrapeTasksScheduleRequest)(nil),    // 20: metricsherlock.targetgroups.v1.GetScrapeTasksScheduleRequest
+	(*GetScrapeTasksScheduleResponse)(nil),   // 21: metricsherlock.targetgroups.v1.GetScrapeTasksScheduleResponse
+	(*UpdateScrapeTasksScheduleRequest)(nil), // 22: metricsherlock.targetgroups.v1.UpdateScrapeTasksScheduleRequest
+	(*TargetGroupDetails)(nil),               // 23: metricsherlock.targetgroups.v1.TargetGroupDetails
+	(*TargetGroupSummary)(nil),               // 24: metricsherlock.targetgroups.v1.TargetGroupSummary
+	(*ViolationStats)(nil),                   // 25: metricsherlock.targetgroups.v1.ViolationStats
+	(*ViolationDetails)(nil),                 // 26: metricsherlock.targetgroups.v1.ViolationDetails
+	(*CheckMetrics)(nil),                     // 27: metricsherlock.targetgroups.v1.CheckMetrics
+	(*CheckMetric)(nil),                      // 28: metricsherlock.targetgroups.v1.CheckMetric
+	(*MaxViolationStats)(nil),                // 29: metricsherlock.targetgroups.v1.MaxViolationStats
+	(*MetricNameViolation)(nil),              // 30: metricsherlock.targetgroups.v1.MetricNameViolation
+	(*LabelNameViolation)(nil),               // 31: metricsherlock.targetgroups.v1.LabelNameViolation
+	(*LabelValueViolation)(nil),              // 32: metricsherlock.targetgroups.v1.LabelValueViolation
+	(*CardinalityViolation)(nil),             // 33: metricsherlock.targetgroups.v1.CardinalityViolation
+	(*HistogramBucketsViolation)(nil),        // 34: metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	(*timestamppb.Timestamp)(nil),            // 35: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                    // 36: google.protobuf.Empty
 }
 var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_depIdxs = []int32{
-	17, // 0: metricsherlock.targetgroups.v1.ListTargetGroupsResponse.target_groups:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
-	16, // 1: metricsherlock.targetgroups.v1.GetTargetGroupResponse.target_group:type_name -> metricsherlock.targetgroups.v1.TargetGroupDetails
+	24, // 0: metricsherlock.targetgroups.v1.ListTargetGroupsResponse.target_groups:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
+	23, // 1: metricsherlock.targetgroups.v1.GetTargetGroupResponse.target_group:type_name -> metricsherlock.targetgroups.v1.TargetGroupDetails
 	8,  // 2: metricsherlock.targetgroups.v1.ListMetricWhitelistResponse.items:type_name -> metricsherlock.targetgroups.v1.MetricWhitelistItem
 	8,  // 3: metricsherlock.targetgroups.v1.UpsertMetricWhitelistRequest.item:type_name -> metricsherlock.targetgroups.v1.MetricWhitelistItem
 	9,  // 4: metricsherlock.targetgroups.v1.MetricWhitelistItem.checks:type_name -> metricsherlock.targetgroups.v1.MetricWhitelistChecks
 	14, // 5: metricsherlock.targetgroups.v1.ListTargetWhitelistResponse.items:type_name -> metricsherlock.targetgroups.v1.TargetWhitelistItem
 	14, // 6: metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest.item:type_name -> metricsherlock.targetgroups.v1.TargetWhitelistItem
 	15, // 7: metricsherlock.targetgroups.v1.TargetWhitelistItem.checks:type_name -> metricsherlock.targetgroups.v1.TargetWhitelistChecks
-	17, // 8: metricsherlock.targetgroups.v1.TargetGroupDetails.summary:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
-	19, // 9: metricsherlock.targetgroups.v1.TargetGroupDetails.violations:type_name -> metricsherlock.targetgroups.v1.ViolationDetails
-	28, // 10: metricsherlock.targetgroups.v1.TargetGroupDetails.report_created_at:type_name -> google.protobuf.Timestamp
-	28, // 11: metricsherlock.targetgroups.v1.TargetGroupSummary.first_check:type_name -> google.protobuf.Timestamp
-	28, // 12: metricsherlock.targetgroups.v1.TargetGroupSummary.last_check:type_name -> google.protobuf.Timestamp
-	18, // 13: metricsherlock.targetgroups.v1.TargetGroupSummary.violation_stats:type_name -> metricsherlock.targetgroups.v1.ViolationStats
-	23, // 14: metricsherlock.targetgroups.v1.ViolationDetails.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
-	24, // 15: metricsherlock.targetgroups.v1.ViolationDetails.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
-	25, // 16: metricsherlock.targetgroups.v1.ViolationDetails.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
-	26, // 17: metricsherlock.targetgroups.v1.ViolationDetails.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
-	27, // 18: metricsherlock.targetgroups.v1.ViolationDetails.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	22, // 19: metricsherlock.targetgroups.v1.ViolationDetails.max:type_name -> metricsherlock.targetgroups.v1.MaxViolationStats
-	20, // 20: metricsherlock.targetgroups.v1.ViolationDetails.checks:type_name -> metricsherlock.targetgroups.v1.CheckMetrics
-	21, // 21: metricsherlock.targetgroups.v1.CheckMetrics.metric_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	21, // 22: metricsherlock.targetgroups.v1.CheckMetrics.label_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	21, // 23: metricsherlock.targetgroups.v1.CheckMetrics.label_value_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	21, // 24: metricsherlock.targetgroups.v1.CheckMetrics.cardinality:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	21, // 25: metricsherlock.targetgroups.v1.CheckMetrics.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	21, // 26: metricsherlock.targetgroups.v1.CheckMetrics.response_weight:type_name -> metricsherlock.targetgroups.v1.CheckMetric
-	23, // 27: metricsherlock.targetgroups.v1.MaxViolationStats.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
-	24, // 28: metricsherlock.targetgroups.v1.MaxViolationStats.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
-	25, // 29: metricsherlock.targetgroups.v1.MaxViolationStats.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
-	26, // 30: metricsherlock.targetgroups.v1.MaxViolationStats.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
-	27, // 31: metricsherlock.targetgroups.v1.MaxViolationStats.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	0,  // 32: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:input_type -> metricsherlock.targetgroups.v1.ListTargetGroupsRequest
-	2,  // 33: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:input_type -> metricsherlock.targetgroups.v1.GetTargetGroupRequest
-	4,  // 34: metricsherlock.targetgroups.v1.TargetGroupsService.ListMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.ListMetricWhitelistRequest
-	6,  // 35: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.UpsertMetricWhitelistRequest
-	7,  // 36: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.DeleteMetricWhitelistRequest
-	10, // 37: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.ListTargetWhitelistRequest
-	12, // 38: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest
-	13, // 39: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest
-	1,  // 40: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:output_type -> metricsherlock.targetgroups.v1.ListTargetGroupsResponse
-	3,  // 41: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:output_type -> metricsherlock.targetgroups.v1.GetTargetGroupResponse
-	5,  // 42: metricsherlock.targetgroups.v1.TargetGroupsService.ListMetricWhitelist:output_type -> metricsherlock.targetgroups.v1.ListMetricWhitelistResponse
-	29, // 43: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertMetricWhitelist:output_type -> google.protobuf.Empty
-	29, // 44: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteMetricWhitelist:output_type -> google.protobuf.Empty
-	11, // 45: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetWhitelist:output_type -> metricsherlock.targetgroups.v1.ListTargetWhitelistResponse
-	29, // 46: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertTargetWhitelist:output_type -> google.protobuf.Empty
-	29, // 47: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteTargetWhitelist:output_type -> google.protobuf.Empty
-	40, // [40:48] is the sub-list for method output_type
-	32, // [32:40] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	19, // 8: metricsherlock.targetgroups.v1.GetMetricCheckLimitsResponse.limits:type_name -> metricsherlock.targetgroups.v1.MetricCheckLimits
+	19, // 9: metricsherlock.targetgroups.v1.UpdateMetricCheckLimitsRequest.limits:type_name -> metricsherlock.targetgroups.v1.MetricCheckLimits
+	24, // 10: metricsherlock.targetgroups.v1.TargetGroupDetails.summary:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
+	26, // 11: metricsherlock.targetgroups.v1.TargetGroupDetails.violations:type_name -> metricsherlock.targetgroups.v1.ViolationDetails
+	35, // 12: metricsherlock.targetgroups.v1.TargetGroupDetails.report_created_at:type_name -> google.protobuf.Timestamp
+	35, // 13: metricsherlock.targetgroups.v1.TargetGroupSummary.first_check:type_name -> google.protobuf.Timestamp
+	35, // 14: metricsherlock.targetgroups.v1.TargetGroupSummary.last_check:type_name -> google.protobuf.Timestamp
+	25, // 15: metricsherlock.targetgroups.v1.TargetGroupSummary.violation_stats:type_name -> metricsherlock.targetgroups.v1.ViolationStats
+	30, // 16: metricsherlock.targetgroups.v1.ViolationDetails.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
+	31, // 17: metricsherlock.targetgroups.v1.ViolationDetails.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
+	32, // 18: metricsherlock.targetgroups.v1.ViolationDetails.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
+	33, // 19: metricsherlock.targetgroups.v1.ViolationDetails.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
+	34, // 20: metricsherlock.targetgroups.v1.ViolationDetails.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	29, // 21: metricsherlock.targetgroups.v1.ViolationDetails.max:type_name -> metricsherlock.targetgroups.v1.MaxViolationStats
+	27, // 22: metricsherlock.targetgroups.v1.ViolationDetails.checks:type_name -> metricsherlock.targetgroups.v1.CheckMetrics
+	28, // 23: metricsherlock.targetgroups.v1.CheckMetrics.metric_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	28, // 24: metricsherlock.targetgroups.v1.CheckMetrics.label_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	28, // 25: metricsherlock.targetgroups.v1.CheckMetrics.label_value_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	28, // 26: metricsherlock.targetgroups.v1.CheckMetrics.cardinality:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	28, // 27: metricsherlock.targetgroups.v1.CheckMetrics.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	28, // 28: metricsherlock.targetgroups.v1.CheckMetrics.response_weight:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	30, // 29: metricsherlock.targetgroups.v1.MaxViolationStats.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
+	31, // 30: metricsherlock.targetgroups.v1.MaxViolationStats.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
+	32, // 31: metricsherlock.targetgroups.v1.MaxViolationStats.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
+	33, // 32: metricsherlock.targetgroups.v1.MaxViolationStats.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
+	34, // 33: metricsherlock.targetgroups.v1.MaxViolationStats.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	0,  // 34: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:input_type -> metricsherlock.targetgroups.v1.ListTargetGroupsRequest
+	2,  // 35: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:input_type -> metricsherlock.targetgroups.v1.GetTargetGroupRequest
+	4,  // 36: metricsherlock.targetgroups.v1.TargetGroupsService.ListMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.ListMetricWhitelistRequest
+	6,  // 37: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.UpsertMetricWhitelistRequest
+	7,  // 38: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteMetricWhitelist:input_type -> metricsherlock.targetgroups.v1.DeleteMetricWhitelistRequest
+	10, // 39: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.ListTargetWhitelistRequest
+	12, // 40: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.UpsertTargetWhitelistRequest
+	13, // 41: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteTargetWhitelist:input_type -> metricsherlock.targetgroups.v1.DeleteTargetWhitelistRequest
+	16, // 42: metricsherlock.targetgroups.v1.TargetGroupsService.GetMetricCheckLimits:input_type -> metricsherlock.targetgroups.v1.GetMetricCheckLimitsRequest
+	18, // 43: metricsherlock.targetgroups.v1.TargetGroupsService.UpdateMetricCheckLimits:input_type -> metricsherlock.targetgroups.v1.UpdateMetricCheckLimitsRequest
+	20, // 44: metricsherlock.targetgroups.v1.TargetGroupsService.GetScrapeTasksSchedule:input_type -> metricsherlock.targetgroups.v1.GetScrapeTasksScheduleRequest
+	22, // 45: metricsherlock.targetgroups.v1.TargetGroupsService.UpdateScrapeTasksSchedule:input_type -> metricsherlock.targetgroups.v1.UpdateScrapeTasksScheduleRequest
+	1,  // 46: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:output_type -> metricsherlock.targetgroups.v1.ListTargetGroupsResponse
+	3,  // 47: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:output_type -> metricsherlock.targetgroups.v1.GetTargetGroupResponse
+	5,  // 48: metricsherlock.targetgroups.v1.TargetGroupsService.ListMetricWhitelist:output_type -> metricsherlock.targetgroups.v1.ListMetricWhitelistResponse
+	36, // 49: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertMetricWhitelist:output_type -> google.protobuf.Empty
+	36, // 50: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteMetricWhitelist:output_type -> google.protobuf.Empty
+	11, // 51: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetWhitelist:output_type -> metricsherlock.targetgroups.v1.ListTargetWhitelistResponse
+	36, // 52: metricsherlock.targetgroups.v1.TargetGroupsService.UpsertTargetWhitelist:output_type -> google.protobuf.Empty
+	36, // 53: metricsherlock.targetgroups.v1.TargetGroupsService.DeleteTargetWhitelist:output_type -> google.protobuf.Empty
+	17, // 54: metricsherlock.targetgroups.v1.TargetGroupsService.GetMetricCheckLimits:output_type -> metricsherlock.targetgroups.v1.GetMetricCheckLimitsResponse
+	36, // 55: metricsherlock.targetgroups.v1.TargetGroupsService.UpdateMetricCheckLimits:output_type -> google.protobuf.Empty
+	21, // 56: metricsherlock.targetgroups.v1.TargetGroupsService.GetScrapeTasksSchedule:output_type -> metricsherlock.targetgroups.v1.GetScrapeTasksScheduleResponse
+	36, // 57: metricsherlock.targetgroups.v1.TargetGroupsService.UpdateScrapeTasksSchedule:output_type -> google.protobuf.Empty
+	46, // [46:58] is the sub-list for method output_type
+	34, // [34:46] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_proto_metricsherlock_targetgroups_v1_target_groups_proto_init() }
@@ -1993,7 +2362,7 @@ func file_proto_metricsherlock_targetgroups_v1_target_groups_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc), len(file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   28,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

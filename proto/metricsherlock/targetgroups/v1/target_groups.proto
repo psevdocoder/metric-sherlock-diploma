@@ -58,6 +58,32 @@ service TargetGroupsService {
       delete: "/api/v1/whitelist/targets/{target_group}/{env}"
     };
   }
+
+  rpc GetMetricCheckLimits(GetMetricCheckLimitsRequest) returns (GetMetricCheckLimitsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/settings/metric-check-limits"
+    };
+  }
+
+  rpc UpdateMetricCheckLimits(UpdateMetricCheckLimitsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/settings/metric-check-limits"
+      body: "*"
+    };
+  }
+
+  rpc GetScrapeTasksSchedule(GetScrapeTasksScheduleRequest) returns (GetScrapeTasksScheduleResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/settings/scrape-tasks-schedule"
+    };
+  }
+
+  rpc UpdateScrapeTasksSchedule(UpdateScrapeTasksScheduleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/settings/scrape-tasks-schedule"
+      body: "*"
+    };
+  }
 }
 
 message ListTargetGroupsRequest {
@@ -141,6 +167,35 @@ message TargetWhitelistChecks {
   bool cardinality = 4;
   bool histogram_buckets = 5;
   bool response_weight = 6;
+}
+
+message GetMetricCheckLimitsRequest {}
+
+message GetMetricCheckLimitsResponse {
+  MetricCheckLimits limits = 1;
+}
+
+message UpdateMetricCheckLimitsRequest {
+  MetricCheckLimits limits = 1;
+}
+
+message MetricCheckLimits {
+  int64 max_metric_name_len = 1;
+  int64 max_label_name_len = 2;
+  int64 max_label_value_len = 3;
+  int64 max_metric_cardinality = 4;
+  int64 max_histogram_buckets = 5;
+  int64 max_bytes_weight = 6;
+}
+
+message GetScrapeTasksScheduleRequest {}
+
+message GetScrapeTasksScheduleResponse {
+  string cron_expr = 1;
+}
+
+message UpdateScrapeTasksScheduleRequest {
+  string cron_expr = 1;
 }
 
 message TargetGroupDetails {

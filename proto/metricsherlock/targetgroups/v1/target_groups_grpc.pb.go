@@ -20,14 +20,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TargetGroupsService_ListTargetGroups_FullMethodName      = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetGroups"
-	TargetGroupsService_GetTargetGroup_FullMethodName        = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetTargetGroup"
-	TargetGroupsService_ListMetricWhitelist_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListMetricWhitelist"
-	TargetGroupsService_UpsertMetricWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertMetricWhitelist"
-	TargetGroupsService_DeleteMetricWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteMetricWhitelist"
-	TargetGroupsService_ListTargetWhitelist_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetWhitelist"
-	TargetGroupsService_UpsertTargetWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertTargetWhitelist"
-	TargetGroupsService_DeleteTargetWhitelist_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteTargetWhitelist"
+	TargetGroupsService_ListTargetGroups_FullMethodName          = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetGroups"
+	TargetGroupsService_GetTargetGroup_FullMethodName            = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetTargetGroup"
+	TargetGroupsService_ListMetricWhitelist_FullMethodName       = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListMetricWhitelist"
+	TargetGroupsService_UpsertMetricWhitelist_FullMethodName     = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertMetricWhitelist"
+	TargetGroupsService_DeleteMetricWhitelist_FullMethodName     = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteMetricWhitelist"
+	TargetGroupsService_ListTargetWhitelist_FullMethodName       = "/metricsherlock.targetgroups.v1.TargetGroupsService/ListTargetWhitelist"
+	TargetGroupsService_UpsertTargetWhitelist_FullMethodName     = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpsertTargetWhitelist"
+	TargetGroupsService_DeleteTargetWhitelist_FullMethodName     = "/metricsherlock.targetgroups.v1.TargetGroupsService/DeleteTargetWhitelist"
+	TargetGroupsService_GetMetricCheckLimits_FullMethodName      = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetMetricCheckLimits"
+	TargetGroupsService_UpdateMetricCheckLimits_FullMethodName   = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateMetricCheckLimits"
+	TargetGroupsService_GetScrapeTasksSchedule_FullMethodName    = "/metricsherlock.targetgroups.v1.TargetGroupsService/GetScrapeTasksSchedule"
+	TargetGroupsService_UpdateScrapeTasksSchedule_FullMethodName = "/metricsherlock.targetgroups.v1.TargetGroupsService/UpdateScrapeTasksSchedule"
 )
 
 // TargetGroupsServiceClient is the client API for TargetGroupsService service.
@@ -42,6 +46,10 @@ type TargetGroupsServiceClient interface {
 	ListTargetWhitelist(ctx context.Context, in *ListTargetWhitelistRequest, opts ...grpc.CallOption) (*ListTargetWhitelistResponse, error)
 	UpsertTargetWhitelist(ctx context.Context, in *UpsertTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteTargetWhitelist(ctx context.Context, in *DeleteTargetWhitelistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetMetricCheckLimits(ctx context.Context, in *GetMetricCheckLimitsRequest, opts ...grpc.CallOption) (*GetMetricCheckLimitsResponse, error)
+	UpdateMetricCheckLimits(ctx context.Context, in *UpdateMetricCheckLimitsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetScrapeTasksSchedule(ctx context.Context, in *GetScrapeTasksScheduleRequest, opts ...grpc.CallOption) (*GetScrapeTasksScheduleResponse, error)
+	UpdateScrapeTasksSchedule(ctx context.Context, in *UpdateScrapeTasksScheduleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type targetGroupsServiceClient struct {
@@ -132,6 +140,46 @@ func (c *targetGroupsServiceClient) DeleteTargetWhitelist(ctx context.Context, i
 	return out, nil
 }
 
+func (c *targetGroupsServiceClient) GetMetricCheckLimits(ctx context.Context, in *GetMetricCheckLimitsRequest, opts ...grpc.CallOption) (*GetMetricCheckLimitsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMetricCheckLimitsResponse)
+	err := c.cc.Invoke(ctx, TargetGroupsService_GetMetricCheckLimits_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) UpdateMetricCheckLimits(ctx context.Context, in *UpdateMetricCheckLimitsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_UpdateMetricCheckLimits_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) GetScrapeTasksSchedule(ctx context.Context, in *GetScrapeTasksScheduleRequest, opts ...grpc.CallOption) (*GetScrapeTasksScheduleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetScrapeTasksScheduleResponse)
+	err := c.cc.Invoke(ctx, TargetGroupsService_GetScrapeTasksSchedule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *targetGroupsServiceClient) UpdateScrapeTasksSchedule(ctx context.Context, in *UpdateScrapeTasksScheduleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TargetGroupsService_UpdateScrapeTasksSchedule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TargetGroupsServiceServer is the server API for TargetGroupsService service.
 // All implementations must embed UnimplementedTargetGroupsServiceServer
 // for forward compatibility.
@@ -144,6 +192,10 @@ type TargetGroupsServiceServer interface {
 	ListTargetWhitelist(context.Context, *ListTargetWhitelistRequest) (*ListTargetWhitelistResponse, error)
 	UpsertTargetWhitelist(context.Context, *UpsertTargetWhitelistRequest) (*emptypb.Empty, error)
 	DeleteTargetWhitelist(context.Context, *DeleteTargetWhitelistRequest) (*emptypb.Empty, error)
+	GetMetricCheckLimits(context.Context, *GetMetricCheckLimitsRequest) (*GetMetricCheckLimitsResponse, error)
+	UpdateMetricCheckLimits(context.Context, *UpdateMetricCheckLimitsRequest) (*emptypb.Empty, error)
+	GetScrapeTasksSchedule(context.Context, *GetScrapeTasksScheduleRequest) (*GetScrapeTasksScheduleResponse, error)
+	UpdateScrapeTasksSchedule(context.Context, *UpdateScrapeTasksScheduleRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTargetGroupsServiceServer()
 }
 
@@ -177,6 +229,18 @@ func (UnimplementedTargetGroupsServiceServer) UpsertTargetWhitelist(context.Cont
 }
 func (UnimplementedTargetGroupsServiceServer) DeleteTargetWhitelist(context.Context, *DeleteTargetWhitelistRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteTargetWhitelist not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) GetMetricCheckLimits(context.Context, *GetMetricCheckLimitsRequest) (*GetMetricCheckLimitsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMetricCheckLimits not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) UpdateMetricCheckLimits(context.Context, *UpdateMetricCheckLimitsRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateMetricCheckLimits not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) GetScrapeTasksSchedule(context.Context, *GetScrapeTasksScheduleRequest) (*GetScrapeTasksScheduleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetScrapeTasksSchedule not implemented")
+}
+func (UnimplementedTargetGroupsServiceServer) UpdateScrapeTasksSchedule(context.Context, *UpdateScrapeTasksScheduleRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateScrapeTasksSchedule not implemented")
 }
 func (UnimplementedTargetGroupsServiceServer) mustEmbedUnimplementedTargetGroupsServiceServer() {}
 func (UnimplementedTargetGroupsServiceServer) testEmbeddedByValue()                             {}
@@ -343,6 +407,78 @@ func _TargetGroupsService_DeleteTargetWhitelist_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TargetGroupsService_GetMetricCheckLimits_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMetricCheckLimitsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).GetMetricCheckLimits(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_GetMetricCheckLimits_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).GetMetricCheckLimits(ctx, req.(*GetMetricCheckLimitsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_UpdateMetricCheckLimits_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMetricCheckLimitsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).UpdateMetricCheckLimits(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_UpdateMetricCheckLimits_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).UpdateMetricCheckLimits(ctx, req.(*UpdateMetricCheckLimitsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_GetScrapeTasksSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetScrapeTasksScheduleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).GetScrapeTasksSchedule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_GetScrapeTasksSchedule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).GetScrapeTasksSchedule(ctx, req.(*GetScrapeTasksScheduleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TargetGroupsService_UpdateScrapeTasksSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateScrapeTasksScheduleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TargetGroupsServiceServer).UpdateScrapeTasksSchedule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TargetGroupsService_UpdateScrapeTasksSchedule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TargetGroupsServiceServer).UpdateScrapeTasksSchedule(ctx, req.(*UpdateScrapeTasksScheduleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TargetGroupsService_ServiceDesc is the grpc.ServiceDesc for TargetGroupsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -381,6 +517,22 @@ var TargetGroupsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTargetWhitelist",
 			Handler:    _TargetGroupsService_DeleteTargetWhitelist_Handler,
+		},
+		{
+			MethodName: "GetMetricCheckLimits",
+			Handler:    _TargetGroupsService_GetMetricCheckLimits_Handler,
+		},
+		{
+			MethodName: "UpdateMetricCheckLimits",
+			Handler:    _TargetGroupsService_UpdateMetricCheckLimits_Handler,
+		},
+		{
+			MethodName: "GetScrapeTasksSchedule",
+			Handler:    _TargetGroupsService_GetScrapeTasksSchedule_Handler,
+		},
+		{
+			MethodName: "UpdateScrapeTasksSchedule",
+			Handler:    _TargetGroupsService_UpdateScrapeTasksSchedule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

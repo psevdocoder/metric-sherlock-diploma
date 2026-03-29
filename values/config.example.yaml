@@ -5,12 +5,15 @@ values:
   - name: env
     value: string
     usage: Application environment (dev, prod)
+  - name: etcd_endpoints
+    value: string
+    usage: Comma separated etcd endpoints
   - name: produce_tasks_cron_expr
     value: string
-    usage: Cron expression for scrape task producer
+    usage: Default cron expression for scrape task producer used to bootstrap etcd key
   - name: limits_config
     value: string
-    usage: JSON encoded limits config for metrics checks
+    usage: Default JSON encoded limits config used to bootstrap etcd key
   - name: kafka_brokers
     value: string
     usage: Comma separated kafka brokers

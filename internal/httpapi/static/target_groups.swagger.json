@@ -16,6 +16,112 @@
     "application/json"
   ],
   "paths": {
+    "/api/v1/settings/metric-check-limits": {
+      "get": {
+        "operationId": "TargetGroupsService_GetMetricCheckLimits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMetricCheckLimitsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TargetGroupsService"
+        ]
+      },
+      "put": {
+        "operationId": "TargetGroupsService_UpdateMetricCheckLimits",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateMetricCheckLimitsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
+    "/api/v1/settings/scrape-tasks-schedule": {
+      "get": {
+        "operationId": "TargetGroupsService_GetScrapeTasksSchedule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetScrapeTasksScheduleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TargetGroupsService"
+        ]
+      },
+      "put": {
+        "operationId": "TargetGroupsService_UpdateScrapeTasksSchedule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateScrapeTasksScheduleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TargetGroupsService"
+        ]
+      }
+    },
     "/api/v1/target-groups": {
       "get": {
         "operationId": "TargetGroupsService_ListTargetGroups",
@@ -369,6 +475,22 @@
         }
       }
     },
+    "v1GetMetricCheckLimitsResponse": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v1MetricCheckLimits"
+        }
+      }
+    },
+    "v1GetScrapeTasksScheduleResponse": {
+      "type": "object",
+      "properties": {
+        "cronExpr": {
+          "type": "string"
+        }
+      }
+    },
     "v1GetTargetGroupResponse": {
       "type": "object",
       "properties": {
@@ -475,6 +597,35 @@
         },
         "histogramBuckets": {
           "$ref": "#/definitions/v1HistogramBucketsViolation"
+        }
+      }
+    },
+    "v1MetricCheckLimits": {
+      "type": "object",
+      "properties": {
+        "maxMetricNameLen": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxLabelNameLen": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxLabelValueLen": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxMetricCardinality": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxHistogramBuckets": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxBytesWeight": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -616,6 +767,22 @@
         },
         "checks": {
           "$ref": "#/definitions/v1TargetWhitelistChecks"
+        }
+      }
+    },
+    "v1UpdateMetricCheckLimitsRequest": {
+      "type": "object",
+      "properties": {
+        "limits": {
+          "$ref": "#/definitions/v1MetricCheckLimits"
+        }
+      }
+    },
+    "v1UpdateScrapeTasksScheduleRequest": {
+      "type": "object",
+      "properties": {
+        "cronExpr": {
+          "type": "string"
         }
       }
     },

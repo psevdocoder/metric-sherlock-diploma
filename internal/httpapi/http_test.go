@@ -96,7 +96,7 @@ func TestRenderSwaggerPageHTML_WithoutClientID(t *testing.T) {
 }
 
 func TestSwaggerOAuth2RedirectPage(t *testing.T) {
-	handler, err := NewHandler(nil, verifierStub{}, "http://localhost:8080/realms/local", "metric-sherlock")
+	handler, err := NewHandler(nil, nil, verifierStub{}, "http://localhost:8080/realms/local", "metric-sherlock")
 	if err != nil {
 		t.Fatalf("NewHandler() error = %v", err)
 	}
