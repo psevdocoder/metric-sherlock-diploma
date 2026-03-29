@@ -25,7 +25,7 @@ const (
 
 type ListTargetGroupsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TeamName      string                 `protobuf:"bytes,1,opt,name=team_name,proto3" json:"team_name,omitempty"`
+	TeamName      string                 `protobuf:"bytes,1,opt,name=team_name,json=teamName,proto3" json:"team_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -468,6 +468,7 @@ type ViolationDetails struct {
 	HistogramBuckets  []*HistogramBucketsViolation `protobuf:"bytes,5,rep,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty"`
 	Max               *MaxViolationStats           `protobuf:"bytes,6,opt,name=max,proto3" json:"max,omitempty"`
 	ResponseWeight    int64                        `protobuf:"varint,7,opt,name=response_weight,json=responseWeight,proto3" json:"response_weight,omitempty"`
+	Checks            *CheckMetrics                `protobuf:"bytes,8,opt,name=checks,proto3" json:"checks,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -551,6 +552,149 @@ func (x *ViolationDetails) GetResponseWeight() int64 {
 	return 0
 }
 
+func (x *ViolationDetails) GetChecks() *CheckMetrics {
+	if x != nil {
+		return x.Checks
+	}
+	return nil
+}
+
+type CheckMetrics struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	MetricNameLength *CheckMetric           `protobuf:"bytes,1,opt,name=metric_name_length,json=metricNameLength,proto3" json:"metric_name_length,omitempty"`
+	LabelNameLength  *CheckMetric           `protobuf:"bytes,2,opt,name=label_name_length,json=labelNameLength,proto3" json:"label_name_length,omitempty"`
+	LabelValueLength *CheckMetric           `protobuf:"bytes,3,opt,name=label_value_length,json=labelValueLength,proto3" json:"label_value_length,omitempty"`
+	Cardinality      *CheckMetric           `protobuf:"bytes,4,opt,name=cardinality,proto3" json:"cardinality,omitempty"`
+	HistogramBuckets *CheckMetric           `protobuf:"bytes,5,opt,name=histogram_buckets,json=histogramBuckets,proto3" json:"histogram_buckets,omitempty"`
+	ResponseWeight   *CheckMetric           `protobuf:"bytes,6,opt,name=response_weight,json=responseWeight,proto3" json:"response_weight,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CheckMetrics) Reset() {
+	*x = CheckMetrics{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckMetrics) ProtoMessage() {}
+
+func (x *CheckMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckMetrics.ProtoReflect.Descriptor instead.
+func (*CheckMetrics) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CheckMetrics) GetMetricNameLength() *CheckMetric {
+	if x != nil {
+		return x.MetricNameLength
+	}
+	return nil
+}
+
+func (x *CheckMetrics) GetLabelNameLength() *CheckMetric {
+	if x != nil {
+		return x.LabelNameLength
+	}
+	return nil
+}
+
+func (x *CheckMetrics) GetLabelValueLength() *CheckMetric {
+	if x != nil {
+		return x.LabelValueLength
+	}
+	return nil
+}
+
+func (x *CheckMetrics) GetCardinality() *CheckMetric {
+	if x != nil {
+		return x.Cardinality
+	}
+	return nil
+}
+
+func (x *CheckMetrics) GetHistogramBuckets() *CheckMetric {
+	if x != nil {
+		return x.HistogramBuckets
+	}
+	return nil
+}
+
+func (x *CheckMetrics) GetResponseWeight() *CheckMetric {
+	if x != nil {
+		return x.ResponseWeight
+	}
+	return nil
+}
+
+type CheckMetric struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int64                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	Current       int64                  `protobuf:"varint,2,opt,name=current,proto3" json:"current,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckMetric) Reset() {
+	*x = CheckMetric{}
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckMetric) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckMetric) ProtoMessage() {}
+
+func (x *CheckMetric) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckMetric.ProtoReflect.Descriptor instead.
+func (*CheckMetric) Descriptor() ([]byte, []int) {
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CheckMetric) GetLimit() int64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *CheckMetric) GetCurrent() int64 {
+	if x != nil {
+		return x.Current
+	}
+	return 0
+}
+
 type MaxViolationStats struct {
 	state             protoimpl.MessageState     `protogen:"open.v1"`
 	MetricNameTooLong *MetricNameViolation       `protobuf:"bytes,1,opt,name=metric_name_too_long,json=metricNameTooLong,proto3" json:"metric_name_too_long,omitempty"`
@@ -564,7 +708,7 @@ type MaxViolationStats struct {
 
 func (x *MaxViolationStats) Reset() {
 	*x = MaxViolationStats{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[8]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -576,7 +720,7 @@ func (x *MaxViolationStats) String() string {
 func (*MaxViolationStats) ProtoMessage() {}
 
 func (x *MaxViolationStats) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[8]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -589,7 +733,7 @@ func (x *MaxViolationStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MaxViolationStats.ProtoReflect.Descriptor instead.
 func (*MaxViolationStats) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{8}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MaxViolationStats) GetMetricNameTooLong() *MetricNameViolation {
@@ -637,7 +781,7 @@ type MetricNameViolation struct {
 
 func (x *MetricNameViolation) Reset() {
 	*x = MetricNameViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[9]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -649,7 +793,7 @@ func (x *MetricNameViolation) String() string {
 func (*MetricNameViolation) ProtoMessage() {}
 
 func (x *MetricNameViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[9]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -662,7 +806,7 @@ func (x *MetricNameViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricNameViolation.ProtoReflect.Descriptor instead.
 func (*MetricNameViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{9}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MetricNameViolation) GetMetricName() string {
@@ -690,7 +834,7 @@ type LabelNameViolation struct {
 
 func (x *LabelNameViolation) Reset() {
 	*x = LabelNameViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[10]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -702,7 +846,7 @@ func (x *LabelNameViolation) String() string {
 func (*LabelNameViolation) ProtoMessage() {}
 
 func (x *LabelNameViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[10]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -715,7 +859,7 @@ func (x *LabelNameViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LabelNameViolation.ProtoReflect.Descriptor instead.
 func (*LabelNameViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{10}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *LabelNameViolation) GetMetricName() string {
@@ -751,7 +895,7 @@ type LabelValueViolation struct {
 
 func (x *LabelValueViolation) Reset() {
 	*x = LabelValueViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[11]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -763,7 +907,7 @@ func (x *LabelValueViolation) String() string {
 func (*LabelValueViolation) ProtoMessage() {}
 
 func (x *LabelValueViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[11]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -776,7 +920,7 @@ func (x *LabelValueViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LabelValueViolation.ProtoReflect.Descriptor instead.
 func (*LabelValueViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{11}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LabelValueViolation) GetMetricName() string {
@@ -817,7 +961,7 @@ type CardinalityViolation struct {
 
 func (x *CardinalityViolation) Reset() {
 	*x = CardinalityViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[12]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -829,7 +973,7 @@ func (x *CardinalityViolation) String() string {
 func (*CardinalityViolation) ProtoMessage() {}
 
 func (x *CardinalityViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[12]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -842,7 +986,7 @@ func (x *CardinalityViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardinalityViolation.ProtoReflect.Descriptor instead.
 func (*CardinalityViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{12}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CardinalityViolation) GetMetricName() string {
@@ -869,7 +1013,7 @@ type HistogramBucketsViolation struct {
 
 func (x *HistogramBucketsViolation) Reset() {
 	*x = HistogramBucketsViolation{}
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[13]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -881,7 +1025,7 @@ func (x *HistogramBucketsViolation) String() string {
 func (*HistogramBucketsViolation) ProtoMessage() {}
 
 func (x *HistogramBucketsViolation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[13]
+	mi := &file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -894,7 +1038,7 @@ func (x *HistogramBucketsViolation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistogramBucketsViolation.ProtoReflect.Descriptor instead.
 func (*HistogramBucketsViolation) Descriptor() ([]byte, []int) {
-	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{13}
+	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *HistogramBucketsViolation) GetMetricName() string {
@@ -915,9 +1059,9 @@ var File_proto_metricsherlock_targetgroups_v1_target_groups_proto protoreflect.F
 
 const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = "" +
 	"\n" +
-	"8proto/metricsherlock/targetgroups/v1/target_groups.proto\x12\x1emetricsherlock.targetgroups.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"7\n" +
-	"\x17ListTargetGroupsRequest\x12\x1c\n" +
-	"\tteam_name\x18\x01 \x01(\tR\tteam_name\"s\n" +
+	"8proto/metricsherlock/targetgroups/v1/target_groups.proto\x12\x1emetricsherlock.targetgroups.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"6\n" +
+	"\x17ListTargetGroupsRequest\x12\x1b\n" +
+	"\tteam_name\x18\x01 \x01(\tR\bteamName\"s\n" +
 	"\x18ListTargetGroupsResponse\x12W\n" +
 	"\rtarget_groups\x18\x01 \x03(\v22.metricsherlock.targetgroups.v1.TargetGroupSummaryR\ftargetGroups\"'\n" +
 	"\x15GetTargetGroupRequest\x12\x0e\n" +
@@ -949,7 +1093,7 @@ const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = ""
 	"\x14label_value_too_long\x18\x04 \x01(\x05R\x11labelValueTooLong\x12 \n" +
 	"\vcardinality\x18\x05 \x01(\x05R\vcardinality\x12+\n" +
 	"\x11histogram_buckets\x18\x06 \x01(\x05R\x10histogramBuckets\x12'\n" +
-	"\x0fresponse_weight\x18\a \x01(\x03R\x0eresponseWeight\"\xef\x04\n" +
+	"\x0fresponse_weight\x18\a \x01(\x03R\x0eresponseWeight\"\xb5\x05\n" +
 	"\x10ViolationDetails\x12d\n" +
 	"\x14metric_name_too_long\x18\x01 \x03(\v23.metricsherlock.targetgroups.v1.MetricNameViolationR\x11metricNameTooLong\x12a\n" +
 	"\x13label_name_too_long\x18\x02 \x03(\v22.metricsherlock.targetgroups.v1.LabelNameViolationR\x10labelNameTooLong\x12d\n" +
@@ -957,7 +1101,18 @@ const file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc = ""
 	"\vcardinality\x18\x04 \x03(\v24.metricsherlock.targetgroups.v1.CardinalityViolationR\vcardinality\x12f\n" +
 	"\x11histogram_buckets\x18\x05 \x03(\v29.metricsherlock.targetgroups.v1.HistogramBucketsViolationR\x10histogramBuckets\x12C\n" +
 	"\x03max\x18\x06 \x01(\v21.metricsherlock.targetgroups.v1.MaxViolationStatsR\x03max\x12'\n" +
-	"\x0fresponse_weight\x18\a \x01(\x03R\x0eresponseWeight\"\x82\x04\n" +
+	"\x0fresponse_weight\x18\a \x01(\x03R\x0eresponseWeight\x12D\n" +
+	"\x06checks\x18\b \x01(\v2,.metricsherlock.targetgroups.v1.CheckMetricsR\x06checks\"\x9c\x04\n" +
+	"\fCheckMetrics\x12Y\n" +
+	"\x12metric_name_length\x18\x01 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\x10metricNameLength\x12W\n" +
+	"\x11label_name_length\x18\x02 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\x0flabelNameLength\x12Y\n" +
+	"\x12label_value_length\x18\x03 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\x10labelValueLength\x12M\n" +
+	"\vcardinality\x18\x04 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\vcardinality\x12X\n" +
+	"\x11histogram_buckets\x18\x05 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\x10histogramBuckets\x12T\n" +
+	"\x0fresponse_weight\x18\x06 \x01(\v2+.metricsherlock.targetgroups.v1.CheckMetricR\x0eresponseWeight\"=\n" +
+	"\vCheckMetric\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x03R\x05limit\x12\x18\n" +
+	"\acurrent\x18\x02 \x01(\x03R\acurrent\"\x82\x04\n" +
 	"\x11MaxViolationStats\x12d\n" +
 	"\x14metric_name_too_long\x18\x01 \x01(\v23.metricsherlock.targetgroups.v1.MetricNameViolationR\x11metricNameTooLong\x12a\n" +
 	"\x13label_name_too_long\x18\x02 \x01(\v22.metricsherlock.targetgroups.v1.LabelNameViolationR\x10labelNameTooLong\x12d\n" +
@@ -1005,7 +1160,7 @@ func file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescGZIP()
 	return file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDescData
 }
 
-var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_goTypes = []any{
 	(*ListTargetGroupsRequest)(nil),   // 0: metricsherlock.targetgroups.v1.ListTargetGroupsRequest
 	(*ListTargetGroupsResponse)(nil),  // 1: metricsherlock.targetgroups.v1.ListTargetGroupsResponse
@@ -1015,43 +1170,52 @@ var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_goTypes = []an
 	(*TargetGroupSummary)(nil),        // 5: metricsherlock.targetgroups.v1.TargetGroupSummary
 	(*ViolationStats)(nil),            // 6: metricsherlock.targetgroups.v1.ViolationStats
 	(*ViolationDetails)(nil),          // 7: metricsherlock.targetgroups.v1.ViolationDetails
-	(*MaxViolationStats)(nil),         // 8: metricsherlock.targetgroups.v1.MaxViolationStats
-	(*MetricNameViolation)(nil),       // 9: metricsherlock.targetgroups.v1.MetricNameViolation
-	(*LabelNameViolation)(nil),        // 10: metricsherlock.targetgroups.v1.LabelNameViolation
-	(*LabelValueViolation)(nil),       // 11: metricsherlock.targetgroups.v1.LabelValueViolation
-	(*CardinalityViolation)(nil),      // 12: metricsherlock.targetgroups.v1.CardinalityViolation
-	(*HistogramBucketsViolation)(nil), // 13: metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	(*timestamppb.Timestamp)(nil),     // 14: google.protobuf.Timestamp
+	(*CheckMetrics)(nil),              // 8: metricsherlock.targetgroups.v1.CheckMetrics
+	(*CheckMetric)(nil),               // 9: metricsherlock.targetgroups.v1.CheckMetric
+	(*MaxViolationStats)(nil),         // 10: metricsherlock.targetgroups.v1.MaxViolationStats
+	(*MetricNameViolation)(nil),       // 11: metricsherlock.targetgroups.v1.MetricNameViolation
+	(*LabelNameViolation)(nil),        // 12: metricsherlock.targetgroups.v1.LabelNameViolation
+	(*LabelValueViolation)(nil),       // 13: metricsherlock.targetgroups.v1.LabelValueViolation
+	(*CardinalityViolation)(nil),      // 14: metricsherlock.targetgroups.v1.CardinalityViolation
+	(*HistogramBucketsViolation)(nil), // 15: metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	(*timestamppb.Timestamp)(nil),     // 16: google.protobuf.Timestamp
 }
 var file_proto_metricsherlock_targetgroups_v1_target_groups_proto_depIdxs = []int32{
 	5,  // 0: metricsherlock.targetgroups.v1.ListTargetGroupsResponse.target_groups:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
 	4,  // 1: metricsherlock.targetgroups.v1.GetTargetGroupResponse.target_group:type_name -> metricsherlock.targetgroups.v1.TargetGroupDetails
 	5,  // 2: metricsherlock.targetgroups.v1.TargetGroupDetails.summary:type_name -> metricsherlock.targetgroups.v1.TargetGroupSummary
 	7,  // 3: metricsherlock.targetgroups.v1.TargetGroupDetails.violations:type_name -> metricsherlock.targetgroups.v1.ViolationDetails
-	14, // 4: metricsherlock.targetgroups.v1.TargetGroupDetails.report_created_at:type_name -> google.protobuf.Timestamp
-	14, // 5: metricsherlock.targetgroups.v1.TargetGroupSummary.first_check:type_name -> google.protobuf.Timestamp
-	14, // 6: metricsherlock.targetgroups.v1.TargetGroupSummary.last_check:type_name -> google.protobuf.Timestamp
+	16, // 4: metricsherlock.targetgroups.v1.TargetGroupDetails.report_created_at:type_name -> google.protobuf.Timestamp
+	16, // 5: metricsherlock.targetgroups.v1.TargetGroupSummary.first_check:type_name -> google.protobuf.Timestamp
+	16, // 6: metricsherlock.targetgroups.v1.TargetGroupSummary.last_check:type_name -> google.protobuf.Timestamp
 	6,  // 7: metricsherlock.targetgroups.v1.TargetGroupSummary.violation_stats:type_name -> metricsherlock.targetgroups.v1.ViolationStats
-	9,  // 8: metricsherlock.targetgroups.v1.ViolationDetails.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
-	10, // 9: metricsherlock.targetgroups.v1.ViolationDetails.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
-	11, // 10: metricsherlock.targetgroups.v1.ViolationDetails.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
-	12, // 11: metricsherlock.targetgroups.v1.ViolationDetails.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
-	13, // 12: metricsherlock.targetgroups.v1.ViolationDetails.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	8,  // 13: metricsherlock.targetgroups.v1.ViolationDetails.max:type_name -> metricsherlock.targetgroups.v1.MaxViolationStats
-	9,  // 14: metricsherlock.targetgroups.v1.MaxViolationStats.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
-	10, // 15: metricsherlock.targetgroups.v1.MaxViolationStats.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
-	11, // 16: metricsherlock.targetgroups.v1.MaxViolationStats.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
-	12, // 17: metricsherlock.targetgroups.v1.MaxViolationStats.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
-	13, // 18: metricsherlock.targetgroups.v1.MaxViolationStats.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
-	0,  // 19: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:input_type -> metricsherlock.targetgroups.v1.ListTargetGroupsRequest
-	2,  // 20: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:input_type -> metricsherlock.targetgroups.v1.GetTargetGroupRequest
-	1,  // 21: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:output_type -> metricsherlock.targetgroups.v1.ListTargetGroupsResponse
-	3,  // 22: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:output_type -> metricsherlock.targetgroups.v1.GetTargetGroupResponse
-	21, // [21:23] is the sub-list for method output_type
-	19, // [19:21] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	11, // 8: metricsherlock.targetgroups.v1.ViolationDetails.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
+	12, // 9: metricsherlock.targetgroups.v1.ViolationDetails.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
+	13, // 10: metricsherlock.targetgroups.v1.ViolationDetails.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
+	14, // 11: metricsherlock.targetgroups.v1.ViolationDetails.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
+	15, // 12: metricsherlock.targetgroups.v1.ViolationDetails.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	10, // 13: metricsherlock.targetgroups.v1.ViolationDetails.max:type_name -> metricsherlock.targetgroups.v1.MaxViolationStats
+	8,  // 14: metricsherlock.targetgroups.v1.ViolationDetails.checks:type_name -> metricsherlock.targetgroups.v1.CheckMetrics
+	9,  // 15: metricsherlock.targetgroups.v1.CheckMetrics.metric_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	9,  // 16: metricsherlock.targetgroups.v1.CheckMetrics.label_name_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	9,  // 17: metricsherlock.targetgroups.v1.CheckMetrics.label_value_length:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	9,  // 18: metricsherlock.targetgroups.v1.CheckMetrics.cardinality:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	9,  // 19: metricsherlock.targetgroups.v1.CheckMetrics.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	9,  // 20: metricsherlock.targetgroups.v1.CheckMetrics.response_weight:type_name -> metricsherlock.targetgroups.v1.CheckMetric
+	11, // 21: metricsherlock.targetgroups.v1.MaxViolationStats.metric_name_too_long:type_name -> metricsherlock.targetgroups.v1.MetricNameViolation
+	12, // 22: metricsherlock.targetgroups.v1.MaxViolationStats.label_name_too_long:type_name -> metricsherlock.targetgroups.v1.LabelNameViolation
+	13, // 23: metricsherlock.targetgroups.v1.MaxViolationStats.label_value_too_long:type_name -> metricsherlock.targetgroups.v1.LabelValueViolation
+	14, // 24: metricsherlock.targetgroups.v1.MaxViolationStats.cardinality:type_name -> metricsherlock.targetgroups.v1.CardinalityViolation
+	15, // 25: metricsherlock.targetgroups.v1.MaxViolationStats.histogram_buckets:type_name -> metricsherlock.targetgroups.v1.HistogramBucketsViolation
+	0,  // 26: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:input_type -> metricsherlock.targetgroups.v1.ListTargetGroupsRequest
+	2,  // 27: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:input_type -> metricsherlock.targetgroups.v1.GetTargetGroupRequest
+	1,  // 28: metricsherlock.targetgroups.v1.TargetGroupsService.ListTargetGroups:output_type -> metricsherlock.targetgroups.v1.ListTargetGroupsResponse
+	3,  // 29: metricsherlock.targetgroups.v1.TargetGroupsService.GetTargetGroup:output_type -> metricsherlock.targetgroups.v1.GetTargetGroupResponse
+	28, // [28:30] is the sub-list for method output_type
+	26, // [26:28] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_proto_metricsherlock_targetgroups_v1_target_groups_proto_init() }
@@ -1065,7 +1229,7 @@ func file_proto_metricsherlock_targetgroups_v1_target_groups_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc), len(file_proto_metricsherlock_targetgroups_v1_target_groups_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

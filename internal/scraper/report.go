@@ -49,9 +49,29 @@ type Details struct {
 	Cardinality       []CardinalityViolation      `json:"cardinality,omitempty"`
 	HistogramBuckets  []HistogramBucketsViolation `json:"histogram_buckets,omitempty"`
 
-	Max *MaxStats `json:"max,omitempty"`
+	Max     *MaxStats     `json:"max,omitempty"`
+	Limits  *CheckLimits  `json:"limits,omitempty"`
+	Current *CheckCurrent `json:"current,omitempty"`
 
 	ResponseWeight int64 `json:"response_weight,omitempty"`
+}
+
+type CheckLimits struct {
+	MetricNameLength int64 `json:"metric_name_length,omitempty"`
+	LabelNameLength  int64 `json:"label_name_length,omitempty"`
+	LabelValueLength int64 `json:"label_value_length,omitempty"`
+	Cardinality      int64 `json:"cardinality,omitempty"`
+	HistogramBuckets int64 `json:"histogram_buckets,omitempty"`
+	ResponseWeight   int64 `json:"response_weight,omitempty"`
+}
+
+type CheckCurrent struct {
+	MetricNameLength int64 `json:"metric_name_length,omitempty"`
+	LabelNameLength  int64 `json:"label_name_length,omitempty"`
+	LabelValueLength int64 `json:"label_value_length,omitempty"`
+	Cardinality      int64 `json:"cardinality,omitempty"`
+	HistogramBuckets int64 `json:"histogram_buckets,omitempty"`
+	ResponseWeight   int64 `json:"response_weight,omitempty"`
 }
 
 func (d *Details) ensureMax() {

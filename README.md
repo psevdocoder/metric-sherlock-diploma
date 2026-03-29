@@ -1,24 +1,4 @@
 # metric-sherlock-diploma
 
-## HTTP API
+live kafka events: http://localhost:8081/ui/clusters/local/all-topics/metric-sherlock/messages?limit=100&mode=TAILING&valueSerde=ProtobufDecodeRaw&r=r&partitions=0%2C1%2C2
 
-API описан в protobuf-контракте: `proto/metricsherlock/targetgroups/v1/target_groups.proto`.
-Kafka событие факта проверки нарушений описано в protobuf-контракте:
-`proto/metricsherlock/metricviolations/v1/metric_violation_fact.proto`.
-
-### Endpoints
-
-- `GET /api/v1/target-groups` - список всех target-групп.
-- `GET /api/v1/target-groups?team_name=<team>` - список target-групп конкретной команды.
-- `GET /api/v1/target-groups/{id}` - детальная информация по target-группе, включая статистику нарушений.
-
-### Swagger
-
-- JSON спецификация: `GET /swagger/target-groups.json`
-- UI: `GET /swagger/`
-
-### Генерация proto/Swagger
-
-```bash
-make proto
-```

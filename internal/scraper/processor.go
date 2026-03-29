@@ -71,7 +71,10 @@ func (p *Processor) Process(ctx context.Context, task *scrapetask.ScrapeTask) (*
 		TeamName: task.TeamName,
 	}
 
-	statistic.Checks = buildCheckResults(statistic, p.limits)
+	checks := buildCheckResults(statistic, p.limits)
+	statistic.Checks = checks
+	statistic.Details.Limits = buildCheckLimits(checks)
+	statistic.Details.Current = buildCheckCurrent(checks)
 
 	return statistic, []*TargetGroup{tg}, nil
 }
@@ -199,4 +202,56 @@ func buildCheckResults(report *Report, limits LimitsConfig) []CheckResult {
 			Violated: report.maxResponseWeight > limits.MaxBytesWeight,
 		},
 	}
+}
+
+func buildCheckLimits(checks []CheckResult) *CheckLimits {
+	if len(checks) == 0 {
+		return nil
+	}
+
+	limits := &CheckLimits{}
+	for _, check := range checks {
+		switch check.Type {
+		case CheckTypeMetricNameLength:
+			limits.MetricNameLength = check.Limit
+		case CheckTypeLabelNameLength:
+			limits.LabelNameLength = check.Limit
+		case CheckTypeLabelValueLength:
+			limits.LabelValueLength = check.Limit
+		case CheckTypeCardinality:
+			limits.Cardinality = check.Limit
+		case CheckTypeHistogramBuckets:
+			limits.HistogramBuckets = check.Limit
+		case CheckTypeResponseWeight:
+			limits.ResponseWeight = check.Limit
+		}
+	}
+
+	return limits
+}
+
+func buildCheckCurrent(checks []CheckResult) *CheckCurrent {
+	if len(checks) == 0 {
+		return nil
+	}
+
+	current := &CheckCurrent{}
+	for _, check := range checks {
+		switch check.Type {
+		case CheckTypeMetricNameLength:
+			current.MetricNameLength = check.Current
+		case CheckTypeLabelNameLength:
+			current.LabelNameLength = check.Current
+		case CheckTypeLabelValueLength:
+			current.LabelValueLength = check.Current
+		case CheckTypeCardinality:
+			current.Cardinality = check.Current
+		case CheckTypeHistogramBuckets:
+			current.HistogramBuckets = check.Current
+		case CheckTypeResponseWeight:
+			current.ResponseWeight = check.Current
+		}
+	}
+
+	return current
 }

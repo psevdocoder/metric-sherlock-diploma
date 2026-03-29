@@ -113,6 +113,7 @@ func toViolationDetails(details scraper.Details) *targetgroupsv1.ViolationDetail
 		Cardinality:       make([]*targetgroupsv1.CardinalityViolation, 0, len(details.Cardinality)),
 		HistogramBuckets:  make([]*targetgroupsv1.HistogramBucketsViolation, 0, len(details.HistogramBuckets)),
 		ResponseWeight:    details.ResponseWeight,
+		Checks:            toCheckMetrics(details),
 	}
 
 	for _, violation := range details.MetricNameTooLong {
@@ -187,6 +188,52 @@ func toViolationDetails(details scraper.Details) *targetgroupsv1.ViolationDetail
 	}
 
 	return resp
+}
+
+func toCheckMetrics(details scraper.Details) *targetgroupsv1.CheckMetrics {
+	if details.Limits == nil && details.Current == nil {
+		return nil
+	}
+
+	return &targetgroupsv1.CheckMetrics{
+		MetricNameLength: toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.MetricNameLength }, func(c *scraper.CheckCurrent) int64 { return c.MetricNameLength }),
+		LabelNameLength:  toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.LabelNameLength }, func(c *scraper.CheckCurrent) int64 { return c.LabelNameLength }),
+		LabelValueLength: toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.LabelValueLength }, func(c *scraper.CheckCurrent) int64 { return c.LabelValueLength }),
+		Cardinality:      toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.Cardinality }, func(c *scraper.CheckCurrent) int64 { return c.Cardinality }),
+		HistogramBuckets: toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.HistogramBuckets }, func(c *scraper.CheckCurrent) int64 { return c.HistogramBuckets }),
+		ResponseWeight:   toCheckMetric(details, func(l *scraper.CheckLimits) int64 { return l.ResponseWeight }, func(c *scraper.CheckCurrent) int64 { return c.ResponseWeight }),
+	}
+}
+
+func toCheckMetric(
+	details scraper.Details,
+	getLimit func(*scraper.CheckLimits) int64,
+	getCurrent func(*scraper.CheckCurrent) int64,
+) *targetgroupsv1.CheckMetric {
+	var (
+		limit   int64
+		current int64
+		hasData bool
+	)
+
+	if details.Limits != nil {
+		limit = getLimit(details.Limits)
+		hasData = true
+	}
+
+	if details.Current != nil {
+		current = getCurrent(details.Current)
+		hasData = true
+	}
+
+	if !hasData {
+		return nil
+	}
+
+	return &targetgroupsv1.CheckMetric{
+		Limit:   limit,
+		Current: current,
+	}
 }
 
 func toTimestamp(value *time.Time) *timestamppb.Timestamp {

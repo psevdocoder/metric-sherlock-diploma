@@ -35,7 +35,7 @@
         },
         "parameters": [
           {
-            "name": "team_name",
+            "name": "teamName",
             "in": "query",
             "required": false,
             "type": "string"
@@ -116,6 +116,42 @@
         "value": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "v1CheckMetric": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "string",
+          "format": "int64"
+        },
+        "current": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1CheckMetrics": {
+      "type": "object",
+      "properties": {
+        "metricNameLength": {
+          "$ref": "#/definitions/v1CheckMetric"
+        },
+        "labelNameLength": {
+          "$ref": "#/definitions/v1CheckMetric"
+        },
+        "labelValueLength": {
+          "$ref": "#/definitions/v1CheckMetric"
+        },
+        "cardinality": {
+          "$ref": "#/definitions/v1CheckMetric"
+        },
+        "histogramBuckets": {
+          "$ref": "#/definitions/v1CheckMetric"
+        },
+        "responseWeight": {
+          "$ref": "#/definitions/v1CheckMetric"
         }
       }
     },
@@ -310,6 +346,9 @@
         "responseWeight": {
           "type": "string",
           "format": "int64"
+        },
+        "checks": {
+          "$ref": "#/definitions/v1CheckMetrics"
         }
       }
     },

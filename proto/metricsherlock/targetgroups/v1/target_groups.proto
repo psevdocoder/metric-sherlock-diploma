@@ -73,6 +73,21 @@ message ViolationDetails {
   repeated HistogramBucketsViolation histogram_buckets = 5;
   MaxViolationStats max = 6;
   int64 response_weight = 7;
+  CheckMetrics checks = 8;
+}
+
+message CheckMetrics {
+  CheckMetric metric_name_length = 1;
+  CheckMetric label_name_length = 2;
+  CheckMetric label_value_length = 3;
+  CheckMetric cardinality = 4;
+  CheckMetric histogram_buckets = 5;
+  CheckMetric response_weight = 6;
+}
+
+message CheckMetric {
+  int64 limit = 1;
+  int64 current = 2;
 }
 
 message MaxViolationStats {
