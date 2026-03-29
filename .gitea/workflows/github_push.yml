@@ -9,7 +9,7 @@ concurrency:
 
 env:
   SRC_REGISTRY: git.server.lan
-  SRC_IMAGE: ${{ env.REGISTRY }}/${{ gitea.repository }}
+  SRC_IMAGE: ${{ env.SRC_REGISTRY }}/${{ gitea.repository }}
   GHCR_IMAGE: ghcr.io/psevdocoder/metric-sherlock-diploma
 
 jobs:
