@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"git.server.lan/maksim/metric-sherlock-diploma/internal/scraper"
 	scrapetask "git.server.lan/maksim/metric-sherlock-diploma/internal/scrapetask"
@@ -12,6 +13,15 @@ const saveScrapeTasksSQL = `
 INSERT INTO scrape_tasks (status, created_at, job, addresses, cluster, env, target_group, team_name)
 VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`
 
+const (
+	scrapeTaskCleanupRetention = 24 * time.Hour
+)
+
+const cleanupScrapeTasksSQL = `
+DELETE FROM scrape_tasks
+WHERE status <> $1
+  AND created_at < $2`
+
 // SaveScrapeTasks сохраняет задачи на сбор метрик
 func (s *Storage) SaveScrapeTasks(ctx context.Context, tasks []scrapetask.ScrapeTask) error {
 	conn, err := s.pool.Acquire(ctx)
@@ -19,6 +29,19 @@ func (s *Storage) SaveScrapeTasks(ctx context.Context, tasks []scrapetask.Scrape
 		return err
 	}
 	defer conn.Release()
+
+	if _, err = conn.Exec(
+		ctx,
+		cleanupScrapeTasksSQL,
+		scrapetask.TaskStatusPending,
+		time.Now().Add(-scrapeTaskCleanupRetention),
+	); err != nil {
+		return err
+	}
+
+	if len(tasks) == 0 {
+		return nil
+	}
 
 	total := 0
 	batch := &pgx.Batch{}
