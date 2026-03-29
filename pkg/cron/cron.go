@@ -24,7 +24,7 @@ type Manager struct {
 // NewCronManager конструктор для Manager
 func NewCronManager() *Manager {
 	return &Manager{
-		cron:    cron.New(),
+		cron:    cron.New(cron.WithSeconds()),
 		mu:      sync.Mutex{},
 		entries: make(map[string]cron.EntryID),
 	}
