@@ -263,7 +263,19 @@ func main() {
 	} else {
 		etcdEndpointsRaw, _ := config.GetValue(config.EtcdEndpoints)
 		etcdEndpointsStr, _ := etcdEndpointsRaw.String()
-		etcdEndpoints := strings.Split(etcdEndpointsStr, ",")
+		rawEtcdEndpoints := strings.Split(etcdEndpointsStr, ",")
+		etcdEndpoints := make([]string, 0, len(rawEtcdEndpoints))
+		for _, endpoint := range rawEtcdEndpoints {
+			endpoint = strings.TrimSpace(endpoint)
+			if endpoint == "" {
+				continue
+			}
+			etcdEndpoints = append(etcdEndpoints, endpoint)
+		}
+
+		if len(etcdEndpoints) == 0 {
+			logger.Fatal("Etcd endpoints list is empty")
+		}
 
 		etcdClient, err := clientv3.New(clientv3.Config{
 			Endpoints: etcdEndpoints,
@@ -273,10 +285,9 @@ func main() {
 			logger.Fatal("Failed to create etcd client", zap.Error(err))
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
-
-		_, err = etcdClient.Status(ctx, etcdEndpoints[0])
+		statusCtx, statusCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer statusCancel()
+		_, err = etcdClient.Status(statusCtx, etcdEndpoints[0])
 		if err != nil {
 			logger.Fatal("Failed to connect to etcd",
 				zap.Any("endpoints", etcdEndpoints),
@@ -290,7 +301,13 @@ func main() {
 			return etcdClient.Close()
 		})
 
-		elector, err = leaderelection.NewEtcdElector(ctx, etcdClient)
+		leaderElectionCtx, leaderElectionCancel := context.WithCancel(context.Background())
+		closer.Add(func() error {
+			leaderElectionCancel()
+			return nil
+		})
+
+		elector, err = leaderelection.NewEtcdElector(leaderElectionCtx, etcdClient)
 		if err != nil {
 			logger.Fatal("Failed to create etcd leader elector", zap.Error(err))
 		}
