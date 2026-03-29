@@ -15,6 +15,7 @@ COPY "cmd" "./cmd"
 COPY internal ./internal
 COPY migrations ./migrations
 COPY pkg ./pkg
+COPY proto ./proto
 
 RUN go build -o app "./cmd"
 
