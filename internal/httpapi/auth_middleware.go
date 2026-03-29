@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"git.server.lan/maksim/metric-sherlock-diploma/pkg/jwtclaims"
+	"git.server.lan/pkg/zaplogger/logger"
+	"go.uber.org/zap"
 )
 
 var errInvalidAuthorizationHeader = errors.New("invalid authorization header")
@@ -22,6 +24,7 @@ func authMiddleware(verifier jwtclaims.Verifier) func(http.Handler) http.Handler
 			claims, err := verifier.ParseAndValidate(r.Context(), token)
 			if err != nil {
 				writeAuthError(w, http.StatusUnauthorized, "unauthorized")
+				logger.Error("Failed to verify token", zap.String("token", token), zap.Error(err))
 				return
 			}
 
