@@ -188,3 +188,64 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - metric-sherlock
+
+  clean-9090: &app-base
+    image: git.server.lan/maksim/diploma-fake-service
+    command: [ "-port=9090", "-mode=clean" ]
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  clean-9091:
+    <<: *app-base
+    command: [ "-port=9091", "-mode=clean" ]
+    ports:
+      - "9091:9091"
+
+  full-9190:
+    <<: *app-base
+    command: [ "-port=9190", "-mode=full", "-heavy-labels=5" ]
+    ports:
+      - "9190:9190"
+
+  full-9191:
+    <<: *app-base
+    command: [ "-port=9191", "-mode=full", "-heavy-labels=5" ]
+    ports:
+      - "9191:9191"
+
+  full-9192:
+    <<: *app-base
+    command: [ "-port=9192", "-mode=full", "-heavy-labels=5" ]
+    ports:
+      - "9192:9192"
+
+  partial-9290:
+    <<: *app-base
+    command: [ "-port=9290", "-mode=partial" ]
+    ports:
+      - "9290:9290"
+
+  partial-9291:
+    <<: *app-base
+    command: [ "-port=9291", "-mode=partial" ]
+    ports:
+      - "9291:9291"
+
+  partial-9292:
+    <<: *app-base
+    command: [ "-port=9292", "-mode=partial" ]
+    ports:
+      - "9292:9292"
+
+  heavy-9390:
+    <<: *app-base
+    command: [ "-port=9390", "-mode=heavy", "-heavy-size=100000" ]
+    ports:
+      - "9390:9390"
+
+  heavy-9391:
+    <<: *app-base
+    command: [ "-port=9391", "-mode=heavy", "-heavy-size=100000" ]
+    ports:
+      - "9391:9391"
