@@ -31,7 +31,7 @@ func NewCronManager() *Manager {
 }
 
 // AddTask добавляет задачу с расписанием по cron выражению
-func (m *Manager) AddTask(ctx context.Context, spec string, task Task) error {
+func (m *Manager) AddTask(_ context.Context, spec string, task Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -42,7 +42,7 @@ func (m *Manager) AddTask(ctx context.Context, spec string, task Task) error {
 	id, err := m.cron.AddFunc(spec, func() {
 		logger.Info("Task execution started", zap.String("name", task.Name()))
 		start := time.Now()
-		if err := task.Work(ctx); err != nil {
+		if err := task.Work(context.Background()); err != nil {
 			logger.Error("Task failed", zap.String("name", task.Name()), zap.Error(err))
 			return
 		}
