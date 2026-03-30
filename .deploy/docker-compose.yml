@@ -190,7 +190,7 @@ services:
       - metric-sherlock
 
   clean-9090: &app-base
-    image: git.server.lan/maksim/diploma-fake-service
+    image: git.server.lan/maksim/diploma-fake-service:latest
     command: [ "-port=9090", "-mode=clean" ]
     ports:
       - "9090:9090"
