@@ -41,7 +41,7 @@ const (
 )
 
 func main() {
-	logger.Init(zaploggercore.LogPretty)
+	logger.Init(zaploggercore.LogJSON)
 	logger.SetLogLevel(zaploggercore.TraceLevel)
 	closer.Init(
 		closer.WithSignals(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP),
