@@ -41,8 +41,8 @@ const (
 )
 
 func main() {
-	logger.Init(zaploggercore.LogJSON)
-	logger.SetLogLevel(zaploggercore.TraceLevel)
+	logger.Init(zaploggercore.LogPretty)
+	logger.SetLogLevel(zaploggercore.InfoLevel)
 	closer.Init(
 		closer.WithSignals(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP),
 		closer.WithTimeout(gracefulShutdownTimeout),
@@ -330,7 +330,7 @@ func main() {
 			taskConsumer.SetLeader(true)
 		}
 		cronManager.Start()
-		logger.Info("Started leadership")
+		logger.Warn("Started leadership")
 	})
 
 	elector.AddOnStop(func() {
@@ -341,7 +341,7 @@ func main() {
 			return
 		}
 
-		logger.Info("Stopped leadership")
+		logger.Warn("Stopped leadership")
 	})
 
 	logger.Warn("Application started")
