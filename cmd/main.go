@@ -42,7 +42,7 @@ const (
 
 func main() {
 	logger.Init(zaploggercore.LogPretty)
-	logger.SetLogLevel(zaploggercore.InfoLevel)
+	logger.SetLogLevel(zaploggercore.WarnLevel)
 	closer.Init(
 		closer.WithSignals(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP),
 		closer.WithTimeout(gracefulShutdownTimeout),
@@ -323,7 +323,7 @@ func main() {
 	}()
 
 	elector.AddOnStart(func() {
-		logger.Debug("Handling start leadership")
+		logger.Warn("Handling start leadership")
 
 		// Если запущен локально, то хоть и лидер, но собираем метрики как ведомый
 		if env != localEnv {
@@ -334,7 +334,7 @@ func main() {
 	})
 
 	elector.AddOnStop(func() {
-		logger.Debug("Handling stop leadership")
+		logger.Warn("Handling stop leadership")
 		taskConsumer.SetLeader(false)
 		if err = cronManager.Stop(ctx); err != nil {
 			logger.Error("Failed to stop cron manager on leadership stop", zap.Error(err))
