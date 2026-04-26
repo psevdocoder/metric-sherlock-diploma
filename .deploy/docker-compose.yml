@@ -242,10 +242,19 @@ services:
 
   nginx:
     image: nginx:alpine
+    environment:
+      ONBOARDING_KAFKA_URL: ${ONBOARDING_KAFKA_URL:-/kafka-ui/ui/clusters/local/all-topics/metric-sherlock/messages?limit=100&mode=TAILING&valueSerde=ProtobufDecodeRaw}
+      ONBOARDING_APP_URL: ${ONBOARDING_APP_URL:-/}
+      ONBOARDING_LOGIN: ${ONBOARDING_LOGIN:-iamsherlockadmin}
+      ONBOARDING_PASSWORD: ${ONBOARDING_PASSWORD:-iamsherlockadmin}
+      NGINX_ENVSUBST_TEMPLATE_DIR: /etc/nginx/templates
+      NGINX_ENVSUBST_OUTPUT_DIR: /usr/share/nginx/html
+      NGINX_ENVSUBST_TEMPLATE_SUFFIX: .template
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./onboarding.html.template:/etc/nginx/templates/onboarding.html.template:ro
     depends_on:
       - metric-sherlock
       - kafbat-ui
@@ -272,7 +281,7 @@ services:
 
   # full-9191:
   #   <<: *app-base
-  #   command: [ "-port=9191", "-mode=full", "-heavy-labels=50" ]
+  #   command: [ "-port=9191", "-mode=fulliamsherlockadmin", "-heavy-labels=50" ]
   #   ports:
   #     - "9191:9191"
 

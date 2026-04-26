@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metric Sherlock Onboarding</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: #101323;
+      background: #f7f9fc;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #dde3ee;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(9, 24, 55, 0.07);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 28px;
+    }
+
+    .section {
+      margin-bottom: 18px;
+    }
+
+    .section h2 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+
+    a {
+      color: #0747a6;
+      word-break: break-all;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .copyable {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #eef3fc;
+      border: 1px solid #d3def0;
+      border-radius: 6px;
+      padding: 4px 8px;
+      margin: 2px 0;
+      font: inherit;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .copyable:hover {
+      background: #e5eefb;
+      border-color: #bccfea;
+    }
+
+    .copyable:active {
+      background: #d9e7fb;
+    }
+
+    .copy-icon {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+    }
+
+    .copy-icon::before,
+    .copy-icon::after {
+      content: "";
+      position: absolute;
+      border: 1.4px solid #4468a5;
+      border-radius: 2px;
+      background: #f7fbff;
+      width: 10px;
+      height: 10px;
+      box-sizing: border-box;
+    }
+
+    .copy-icon::before {
+      left: 3px;
+      top: 1px;
+    }
+
+    .copy-icon::after {
+      left: 0;
+      top: 4px;
+    }
+
+    #toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #132a57;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 14px;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    #toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Onboarding</h1>
+
+    <section class="section">
+      <h2>Ссылки</h2>
+      <p><a href="${ONBOARDING_KAFKA_URL}" target="_blank" rel="noopener noreferrer">Live публикуемые сообщения в Kafka</a></p>
+      <p><a href="${ONBOARDING_APP_URL}" target="_blank" rel="noopener noreferrer">UI-Приложение</a></p>
+    </section>
+
+    <section class="section">
+      <h2>Доступ</h2>
+      <p>Логин:
+        <button class="copyable" type="button" data-copy="${ONBOARDING_LOGIN}">
+          <span>${ONBOARDING_LOGIN}</span>
+          <span class="copy-icon" aria-hidden="true"></span>
+        </button>
+      </p>
+      <p>Пароль:
+        <button class="copyable" type="button" data-copy="${ONBOARDING_PASSWORD}">
+          <span>${ONBOARDING_PASSWORD}</span>
+          <span class="copy-icon" aria-hidden="true"></span>
+        </button>
+      </p>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite">Скопировано</div>
+  <script>
+    (function() {
+      var toast = document.getElementById("toast");
+      var hideToastTimer = null;
+      var nodes = document.querySelectorAll(".copyable");
+
+      function showToast() {
+        toast.classList.add("visible");
+        if (hideToastTimer) {
+          clearTimeout(hideToastTimer);
+        }
+        hideToastTimer = setTimeout(function() {
+          toast.classList.remove("visible");
+        }, 1200);
+      }
+
+      async function copyValue(value) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+
+        var area = document.createElement("textarea");
+        area.value = value;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+      }
+
+      nodes.forEach(function(node) {
+        node.addEventListener("click", async function() {
+          var value = node.getAttribute("data-copy") || "";
+          try {
+            await copyValue(value);
+            showToast();
+          } catch (err) {
+            console.error("Failed to copy value", err);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -39,3 +39,4 @@ values/*
 !.deploy/Dockerfile
 !.deploy/Dockerfile.keycloak
 !.deploy/nginx.conf
+!.deploy/onboarding.html.template
